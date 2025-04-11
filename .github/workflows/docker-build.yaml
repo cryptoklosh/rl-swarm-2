@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-push:
-    runs-on: ubuntu-latest
+    runs-on: gha-runner-scale-set-k8s-v2
     steps:
       - uses: actions/checkout@v4
       - name: Set up Docker Buildx
