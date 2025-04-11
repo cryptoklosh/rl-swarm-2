@@ -1,4 +1,5 @@
 import logging
+import os
 
 # Needs to be before trl!
 from hivemind_exp.runner.grpo_runner import GRPOArguments, GRPORunner
@@ -20,6 +21,10 @@ from hivemind_exp.runner.gensyn.testnet_grpo_runner import (
 
 
 def main():
+    try:
+        os.remove("/root/started.ok")
+    except OSError:
+        pass
     # Setup logging.
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.INFO)
