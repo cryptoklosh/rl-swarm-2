@@ -42,7 +42,15 @@ def main():
     else:
         runner = GRPORunner()
 
-    runner.run(model_args, grpo_args, training_args, get_stage1_samples)
+    while True:
+        try:
+            runner.run(model_args, grpo_args, training_args, get_stage1_samples)
+        except Exception as e:
+            try:
+                os.remove("/root/started.ok")
+            except OSError:
+                pass
+            root_logger.exception(e)
 
 
 if __name__ == "__main__":
