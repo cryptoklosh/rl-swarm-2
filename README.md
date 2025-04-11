@@ -23,7 +23,7 @@ Your hardware requirements will vary depending on which swarm and model you choo
 
 **Small model (0.5B or 1.5B) + Math (GSM8K dataset)**
 
-- arm64 or x86 CPU with minimum 16gb ram (note that if you run other applications during training it might crash training).
+- arm64 or x86 CPU with minimum 16gb ram
 
 
 OR
@@ -46,7 +46,6 @@ OR
 
 With either configuration, you will need Python >=3.10 (for Mac, you will likely need to upgrade).
 
-## ⚠️ Please read before continuing ⚠️
 
 This software is **experimental** and provided as-is for users who are interested in using (or helping to develop) an early version of the Gensyn Protocol for training models.
 
@@ -147,13 +146,12 @@ Therefore, you should do these actions in the following scenarios
 
 - **My peer 'skipped a round'**: this occurs when your device isn't fast enough to keep up with the pace of the swarm. For example, if you start training at round 100 and by the time you finish training the rest of the swarm reaches round 102, you will skip round 101 and go straight to 102. This is because your peer is more valuable if it is participating in the active round.
 - **My model doesn't seem to be training?**
-
     - If you're using a consumer device (e.g. a MacBook), it is likely just running slowly - check back in 20 minutes.
-
 - **Logging in with a new account after previous login?**
     
     - Make sure you click 'Logout' on the login screen before you leave your previous session
     - Make sure you delete `swarm.pem` from the root directory (try `sudo rm swarm.pem`). If you don't do this, and you previously registered with the peer-id stored in this file, it will disrupt the training process.
+- **Issues on VMs?**
 
 - **Issues with the Login screen**
 
@@ -172,7 +170,6 @@ Therefore, you should do these actions in the following scenarios
     - **How do I access the login screen if I'm running in a VM?**: port forwarding. Add this SSH flag: `-L 3000:localhost:3000` when connecting to your VM. E.g. `gcloud compute ssh --zone "us-central1-a" [your-vm] --project [your-project] -- -L 3000:localhost:3000`. Note, some VPSs may not work with `rl-swarm`. Check the Gensyn [discord](https://discord.gg/AdnyWNzXh5) for up-to-date information on this.
     
     - **Disconnection/general issues**: If you are tunneling to a VM and suffer a broken pipe, you will likely encounter OOM or unexepected behaviour the first time you relaunch the script. If you `control + c` and kill the script it should spin down all background processes. Restart the script and everything should work normally.
-
 - **Issues with npm/general installation?**
 
     - Try  `npm install -g node@latest`

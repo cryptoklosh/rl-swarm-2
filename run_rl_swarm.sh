@@ -27,7 +27,7 @@ HOST_MULTI_ADDRS=${HOST_MULTI_ADDRS:-$DEFAULT_HOST_MULTI_ADDRS}
 
 # Path to an RSA private key. If this path does not exist, a new key pair will be created.
 # Remove this file if you want a new PeerID.
-DEFAULT_IDENTITY_PATH="$ROOT"/swarm.pem
+DEFAULT_IDENTITY_PATH="$ROOT"/identity/swarm.pem
 IDENTITY_PATH=${IDENTITY_PATH:-$DEFAULT_IDENTITY_PATH}
 
 SMALL_SWARM_CONTRACT="0x69C6e1D608ec64885E7b185d39b04B491a71768C"
@@ -218,6 +218,13 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
 fi
 
 echo_green ">> Getting requirements..."
+pip_install() {
+    pip install --disable-pip-version-check -q -r "$1"
+}
+
+# echo_green ">> Getting requirements..."
+# pip_install "$ROOT"/requirements-hivemind.txt
+# pip_install "$ROOT"/requirements.txt
 
 pip install --upgrade pip
 if [ -n "$CPU_ONLY" ] || ! command -v nvidia-smi &> /dev/null; then
@@ -245,20 +252,21 @@ fi
 
 echo_green ">> Done!"
 
-HF_TOKEN=${HF_TOKEN:-""}
-if [ -n "${HF_TOKEN}" ]; then # Check if HF_TOKEN is already set and use if so. Else give user a prompt to choose.
-    HUGGINGFACE_ACCESS_TOKEN=${HF_TOKEN}
-else
-    echo -en $GREEN_TEXT
-    read -p ">> Would you like to push models you train in the RL swarm to the Hugging Face Hub? [y/N] " yn
-    echo -en $RESET_TEXT
-    yn=${yn:-N} # Default to "N" if the user presses Enter
-    case $yn in
-        [Yy]*) read -p "Enter your Hugging Face access token: " HUGGINGFACE_ACCESS_TOKEN ;;
-        [Nn]*) HUGGINGFACE_ACCESS_TOKEN="None" ;;
-        *) echo ">>> No answer was given, so NO models will be pushed to Hugging Face Hub" && HUGGINGFACE_ACCESS_TOKEN="None" ;;
-    esac
-fi
+HUGGINGFACE_ACCESS_TOKEN=None
+# HF_TOKEN=${HF_TOKEN:-""}
+# if [ -n "${HF_TOKEN}" ]; then # Check if HF_TOKEN is already set and use if so. Else give user a prompt to choose.
+#     HUGGINGFACE_ACCESS_TOKEN=${HF_TOKEN}
+# else
+#     echo -en $GREEN_TEXT
+#     read -p ">> Would you like to push models you train in the RL swarm to the Hugging Face Hub? [y/N] " yn
+#     echo -en $RESET_TEXT
+#     yn=${yn:-N} # Default to "N" if the user presses Enter
+#     case $yn in
+#         [Yy]*) read -p "Enter your Hugging Face access token: " HUGGINGFACE_ACCESS_TOKEN ;;
+#         [Nn]*) HUGGINGFACE_ACCESS_TOKEN="None" ;;
+#         *) echo ">>> No answer was given, so NO models will be pushed to Hugging Face Hub" && HUGGINGFACE_ACCESS_TOKEN="None" ;;
+#     esac
+# fi
 
 echo_green ">> Good luck in the swarm!"
 echo_blue ">> Post about rl-swarm on X/twitter! --> https://tinyurl.com/swarmtweet"
