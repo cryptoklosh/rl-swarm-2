@@ -57,16 +57,22 @@ def main():
         )
     else:
         runner = GRPORunner()
-
-    game = grpo_args.game
-    match game:
-        case "gsm8k":
-            runner.run(model_args, grpo_args, training_args, gsm8k_stage1_samples)
-        case "dapo":
-            runner.run(model_args, grpo_args, training_args, dapo_stage1_samples)
-        case _:
-            raise ValueError()
-
+    while True:
+        try:
+            game = grpo_args.game
+            match game:
+                case "gsm8k":
+                    runner.run(model_args, grpo_args, training_args, gsm8k_stage1_samples)
+                case "dapo":
+                    runner.run(model_args, grpo_args, training_args, dapo_stage1_samples)
+                case _:
+                    raise ValueError()
+        except Exception as e:
+            try:
+                os.remove("/root/started.ok")
+            except OSError:
+                pass
+            root_logger.exception(e)
 
 if __name__ == "__main__":
     main()
