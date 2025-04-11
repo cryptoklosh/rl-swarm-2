@@ -38,6 +38,7 @@ class TestnetGRPORunner(GRPORunner):
 
     def setup_dht(self, grpo_args):
         dht = super().setup_dht(grpo_args)
+        initial_peers = grpo_args.initial_peers
         peer_id = str(dht.peer_id)
         self.register_peer(peer_id)
         return dht
