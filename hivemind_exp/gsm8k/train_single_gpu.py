@@ -1,4 +1,5 @@
 import logging
+import os
 
 import colorlog
 from trl import GRPOConfig, ModelConfig, TrlParser
@@ -17,6 +18,10 @@ from hivemind_exp.runner.grpo_runner import GRPOArguments, GRPORunner
 
 
 def main():
+    try:
+        os.remove("/root/started.ok")
+    except OSError:
+        pass
     # Setup logging.
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.INFO)
