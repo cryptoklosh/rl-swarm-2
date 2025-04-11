@@ -28,5 +28,5 @@ jobs:
           context: .
           platforms: linux/amd64
           tags: ${{ vars.DOCKER__REGISTRY }}/node-gensyn:${{ inputs.tag }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=registry,ref=${{ vars.DOCKER__REGISTRY }}/node-gensyn:cache
+          cache-to: type=registry,ref=${{ vars.DOCKER__REGISTRY }}/node-gensyn:cache,compression=zstd,mode=max
