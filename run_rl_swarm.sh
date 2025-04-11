@@ -27,7 +27,7 @@ HOST_MULTI_ADDRS=${HOST_MULTI_ADDRS:-$DEFAULT_HOST_MULTI_ADDRS}
 
 # Path to an RSA private key. If this path does not exist, a new key pair will be created.
 # Remove this file if you want a new PeerID.
-DEFAULT_IDENTITY_PATH="$ROOT"/swarm.pem
+DEFAULT_IDENTITY_PATH="$ROOT"/identity/swarm.pem
 IDENTITY_PATH=${IDENTITY_PATH:-$DEFAULT_IDENTITY_PATH}
 
 # Will ignore any visible GPUs if set.
@@ -65,17 +65,18 @@ cleanup() {
 
 trap cleanup EXIT
 
-while true; do
-    echo -en $GREEN_TEXT
-    read -p ">> Would you like to connect to the Testnet? [Y/n] " yn
-    echo -en $RESET_TEXT
-    yn=${yn:-Y}  # Default to "Y" if the user presses Enter
-    case $yn in
-        [Yy]*)  CONNECT_TO_TESTNET=True && break ;;
-        [Nn]*)  CONNECT_TO_TESTNET=False && break ;;
-        *)  echo ">>> Please answer yes or no." ;;
-    esac
-done
+CONNECT_TO_TESTNET=True
+# while true; do
+#     echo -en $GREEN_TEXT
+#     read -p ">> Would you like to connect to the Testnet? [Y/n] " yn
+#     echo -en $RESET_TEXT
+#     yn=${yn:-Y}  # Default to "Y" if the user presses Enter
+#     case $yn in
+#         [Yy]*)  CONNECT_TO_TESTNET=True && break ;;
+#         [Nn]*)  CONNECT_TO_TESTNET=False && break ;;
+#         *)  echo ">>> Please answer yes or no." ;;
+#     esac
+# done
 
 if [ "$CONNECT_TO_TESTNET" = "True" ]; then
     # Run modal_login server.
@@ -83,42 +84,28 @@ if [ "$CONNECT_TO_TESTNET" = "True" ]; then
     cd modal-login
     # Check if the yarn command exists; if not, install Yarn.
     source ~/.bashrc
-
-    # Node.js + NVM setup
-    if ! command -v node >/dev/null 2>&1; then
-        echo "Node.js not found. Installing NVM and latest Node.js..."
-        export NVM_DIR="$HOME/.nvm"
-        if [ ! -d "$NVM_DIR" ]; then
-            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-        fi
-        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-        [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-       nvm install node
-    else
-        echo "Node.js is already installed: $(node -v)"
-    fi
-
-    if ! command -v yarn > /dev/null 2>&1; then
-        # Detect Ubuntu (including WSL Ubuntu) and install Yarn accordingly
-        if grep -qi "ubuntu" /etc/os-release 2> /dev/null || uname -r | grep -qi "microsoft"; then
-            echo "Detected Ubuntu or WSL Ubuntu. Installing Yarn via apt..."
-            curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-            echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-            sudo apt update && sudo apt install -y yarn
-        else
-            echo "Yarn is not installed. Installing Yarn..."
-            curl -o- -L https://yarnpkg.com/install.sh | sh
-            echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"' >> ~/.bashrc
-            source ~/.bashrc
-        fi
-    fi
-    yarn install
-    yarn dev > /dev/null 2>&1 & # Run in background and suppress output
+    
+    # if ! command -v yarn >/dev/null 2>&1; then
+    #     # Detect Ubuntu (including WSL Ubuntu) and install Yarn accordingly
+    #     if grep -qi "ubuntu" /etc/os-release 2>/dev/null || uname -r | grep -qi "microsoft"; then
+    #         echo "Detected Ubuntu or WSL Ubuntu. Installing Yarn via apt..."
+    #         curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+    #         echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+    #         sudo apt update && sudo apt install -y yarn
+    #     else
+    #         echo "Yarn is not installed. Installing Yarn..."
+    #         curl -o- -L https://yarnpkg.com/install.sh | sh
+    #         echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"' >> ~/.bashrc
+    #         source ~/.bashrc
+    #     fi
+    # fi
+    # yarn install
+    yarn dev & # Run in background and suppress output
 
     SERVER_PID=$!  # Store the process ID
     echo "Started server process: $SERVER_PID"
     sleep 5
-    open http://localhost:3000
+    # open http://localhost:3000
     cd ..
 
     echo_green ">> Waiting for modal userData.json to be created..."
@@ -148,9 +135,9 @@ pip_install() {
     pip install --disable-pip-version-check -q -r "$1"
 }
 
-echo_green ">> Getting requirements..."
-pip_install "$ROOT"/requirements-hivemind.txt
-pip_install "$ROOT"/requirements.txt
+# echo_green ">> Getting requirements..."
+# pip_install "$ROOT"/requirements-hivemind.txt
+# pip_install "$ROOT"/requirements.txt
 
 if ! command -v nvidia-smi &> /dev/null; then
     # You don't have a NVIDIA GPU
@@ -166,20 +153,21 @@ fi
 
 echo_green ">> Done!"
 
-HF_TOKEN=${HF_TOKEN:-""}
-if [ -n "${HF_TOKEN}" ]; then # Check if HF_TOKEN is already set and use if so. Else give user a prompt to choose.
-    HUGGINGFACE_ACCESS_TOKEN=${HF_TOKEN}
-else
-    echo -en $GREEN_TEXT
-    read -p ">> Would you like to push models you train in the RL swarm to the Hugging Face Hub? [y/N] " yn
-    echo -en $RESET_TEXT
-    yn=${yn:-N} # Default to "N" if the user presses Enter
-    case $yn in
-        [Yy]*) read -p "Enter your Hugging Face access token: " HUGGINGFACE_ACCESS_TOKEN ;;
-        [Nn]*) HUGGINGFACE_ACCESS_TOKEN="None" ;;
-        *) echo ">>> No answer was given, so NO models will be pushed to Hugging Face Hub" && HUGGINGFACE_ACCESS_TOKEN="None" ;;
-    esac
-fi
+HUGGINGFACE_ACCESS_TOKEN=None
+# HF_TOKEN=${HF_TOKEN:-""}
+# if [ -n "${HF_TOKEN}" ]; then # Check if HF_TOKEN is already set and use if so. Else give user a prompt to choose.
+#     HUGGINGFACE_ACCESS_TOKEN=${HF_TOKEN}
+# else
+#     echo -en $GREEN_TEXT
+#     read -p ">> Would you like to push models you train in the RL swarm to the Hugging Face Hub? [y/N] " yn
+#     echo -en $RESET_TEXT
+#     yn=${yn:-N} # Default to "N" if the user presses Enter
+#     case $yn in
+#         [Yy]*) read -p "Enter your Hugging Face access token: " HUGGINGFACE_ACCESS_TOKEN ;;
+#         [Nn]*) HUGGINGFACE_ACCESS_TOKEN="None" ;;
+#         *) echo ">>> No answer was given, so NO models will be pushed to Hugging Face Hub" && HUGGINGFACE_ACCESS_TOKEN="None" ;;
+#     esac
+# fi
 
 echo_green ">> Good luck in the swarm!"
 echo_blue ">> Post about rl-swarm on X/twitter! --> https://tinyurl.com/swarmtweet"
