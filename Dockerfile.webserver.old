@@ -10,8 +10,6 @@ WORKDIR /app
 
 COPY ./web/requirements.txt .
 
-# Install wheel and upgrade pip first
-RUN pip install --upgrade pip wheel setuptools
 RUN pip install --no-cache-dir -r requirements.txt
 
 RUN opentelemetry-bootstrap -a install
