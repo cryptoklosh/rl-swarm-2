@@ -168,15 +168,17 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
 
     cd ..
 
-    echo_green ">> Waiting for modal userData.json to be created..."
-    while [ ! -f "modal-login/temp-data/userData.json" ]; do
-        sleep 5  # Wait for 5 seconds before checking again
-    done
-    echo "Found userData.json. Proceeding..."
+    if [ ! -f "${IDENTITY_PATH}"]; then
+        echo_green ">> Waiting for modal userData.json to be created..."
+        while [ ! -f "modal-login/temp-data/userData.json" ]; do
+            sleep 5  # Wait for 5 seconds before checking again
+        done
+        echo "Found userData.json. Proceeding..."
 
-    ORG_ID=$(awk 'BEGIN { FS = "\"" } !/^[ \t]*[{}]/ { print $(NF - 1); exit }' modal-login/temp-data/userData.json)
-    echo "Your ORG_ID is set to: $ORG_ID"
+        ORG_ID=$(awk 'BEGIN { FS = "\"" } !/^[ \t]*[{}]/ { print $(NF - 1); exit }' modal-login/temp-data/userData.json)
+        echo "Your ORG_ID is set to: $ORG_ID"
 
+<<<<<<< HEAD
     # Wait until the API key is activated by the client
     echo "Waiting for API key to become activated..."
     while true; do
@@ -198,6 +200,32 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
         # Linux version
         sed -i "3s/.*/SMART_CONTRACT_ADDRESS=$SWARM_CONTRACT/" "$ENV_FILE"
     fi
+=======
+        # Wait until the API key is activated by the client
+        echo "Waiting for API key to become activated..."
+        while true; do
+            STATUS=$(curl -s "http://localhost:3000/api/get-api-key-status?orgId=$ORG_ID")
+            if [[ "$STATUS" == "activated" ]]; then
+                echo "API key is activated! Proceeding..."
+                break
+            else
+                echo "Waiting for API key to be activated..."
+                sleep 5
+            fi
+        done
+    fi
+
+    # Function to clean up the server process
+    cleanup() {
+        echo_green ">> Shutting down server..."
+        kill $SERVER_PID
+        rm -r modal-login/temp-data/*.json
+        exit 0
+    }
+
+    # Set up trap to catch Ctrl+C and call cleanup
+    trap cleanup INT
+>>>>>>> df53c1d (Skip checking if swarm already there)
 fi
 
 echo_green ">> Getting requirements..."
