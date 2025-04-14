@@ -194,14 +194,15 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
 
     cd ..
 
-    echo_green ">> Waiting for modal userData.json to be created..."
-    while [ ! -f "modal-login/temp-data/userData.json" ]; do
-        sleep 5  # Wait for 5 seconds before checking again
-    done
-    echo "Found userData.json. Proceeding..."
+    if [ ! -f "${IDENTITY_PATH}"]; then
+        echo_green ">> Waiting for modal userData.json to be created..."
+        while [ ! -f "modal-login/temp-data/userData.json" ]; do
+            sleep 5  # Wait for 5 seconds before checking again
+        done
+        echo "Found userData.json. Proceeding..."
 
-    ORG_ID=$(awk 'BEGIN { FS = "\"" } !/^[ \t]*[{}]/ { print $(NF - 1); exit }' modal-login/temp-data/userData.json)
-    echo "Your ORG_ID is set to: $ORG_ID"
+        ORG_ID=$(awk 'BEGIN { FS = "\"" } !/^[ \t]*[{}]/ { print $(NF - 1); exit }' modal-login/temp-data/userData.json)
+        echo "Your ORG_ID is set to: $ORG_ID"
 
     # Wait until the API key is activated by the client
     echo "Waiting for API key to become activated..."
@@ -215,6 +216,15 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
             sleep 5
         fi
     done
+
+    ENV_FILE="$ROOT"/modal-login/.env
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS version
+        sed -i '' "3s/.*/SMART_CONTRACT_ADDRESS=$SWARM_CONTRACT/" "$ENV_FILE"
+    else
+        # Linux version
+        sed -i "3s/.*/SMART_CONTRACT_ADDRESS=$SWARM_CONTRACT/" "$ENV_FILE"
+    fi
 fi
 
 echo_green ">> Getting requirements..."
