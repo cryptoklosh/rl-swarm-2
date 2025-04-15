@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description: "Modal sign in for Gensyn Testnet",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
