@@ -148,14 +148,19 @@ class ModalSwarmCoordinator(SwarmCoordinator):
 
 
 def send_via_api(org_id, method, args):
-    # Construct URL and payload.
-    url = MODAL_PROXY_URL + method
-    payload = {"orgId": org_id} | args
+    while True:
+        try:
+            # Construct URL and payload.
+            url = MODAL_PROXY_URL + method
+            payload = {"orgId": org_id} | args
 
-    # Send the POST request.
-    response = requests.post(url, json=payload)
-    response.raise_for_status()  # Raise an exception for HTTP errors
-    return response.json()
+            # Send the POST request.
+            response = requests.post(url, json=payload)
+            response.raise_for_status()  # Raise an exception for HTTP errors
+            return response.json()
+            # Attempt to send the request.
+        except requests.exceptions.ConnectionError as e:
+            logger.debug(f"Connection error: {e}. Retrying...")
 
 
 def setup_web3() -> Web3:
