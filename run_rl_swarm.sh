@@ -182,7 +182,6 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
         fi
     done
 
-<<<<<<< HEAD
     ENV_FILE="$ROOT"/modal-login/.env
     if [[ "$OSTYPE" == "darwin"* ]]; then
         # macOS version
@@ -191,18 +190,6 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
         # Linux version
         sed -i "3s/.*/SMART_CONTRACT_ADDRESS=$SWARM_CONTRACT/" "$ENV_FILE"
     fi
-=======
-    # # Function to clean up the server process
-    # cleanup() {
-    #     echo_green ">> Shutting down server..."
-    #     kill $SERVER_PID
-    #     rm -r modal-login/temp-data/*.json
-    #     exit 0
-    # }
-
-    # # Set up trap to catch Ctrl+C and call cleanup
-    # trap cleanup INT
->>>>>>> 17e26e7 (Fix)
 fi
 
 echo_green ">> Getting requirements..."
