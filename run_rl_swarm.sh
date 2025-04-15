@@ -51,19 +51,19 @@ echo_blue() {
 ROOT_DIR="$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)"
 
 # Function to clean up the server process upon exit
-cleanup() {
-    echo_green ">> Shutting down trainer..."
+# cleanup() {
+#     echo_green ">> Shutting down trainer..."
 
-    # Remove modal credentials if they exist
-    rm -r $ROOT_DIR/modal-login/temp-data/*.json 2> /dev/null || true
+#     # Remove modal credentials if they exist
+#     rm -r $ROOT_DIR/modal-login/temp-data/*.json 2> /dev/null || true
 
-    # Kill all processes belonging to this script's process group
-    kill -- -$$ || true
+#     # Kill all processes belonging to this script's process group
+#     kill -- -$$ || true
 
-    exit 0
-}
+#     exit 0
+# }
 
-trap cleanup EXIT
+# trap cleanup EXIT
 
 CONNECT_TO_TESTNET=True
 # while true; do
@@ -133,16 +133,16 @@ if [ "$CONNECT_TO_TESTNET" = "True" ]; then
         fi
     done
 
-    # Function to clean up the server process
-    cleanup() {
-        echo_green ">> Shutting down server..."
-        kill $SERVER_PID
-        rm -r modal-login/temp-data/*.json
-        exit 0
-    }
+    # # Function to clean up the server process
+    # cleanup() {
+    #     echo_green ">> Shutting down server..."
+    #     kill $SERVER_PID
+    #     rm -r modal-login/temp-data/*.json
+    #     exit 0
+    # }
 
-    # Set up trap to catch Ctrl+C and call cleanup
-    trap cleanup INT
+    # # Set up trap to catch Ctrl+C and call cleanup
+    # trap cleanup INT
 fi
 
 pip_install() {
