@@ -79,7 +79,7 @@ def check_dataset(prefix: str, min_count: int, dataset: Dataset):
 
 
 def create_dht_and_trainer(tmp_path, node, min_peers=1, initial_peers=[]):
-    dht = hivemind.DHT(start=True, initial_peers=initial_peers, cache_nearest=min_peers)
+    dht = hivemind.DHT(start=True, ensure_bootstrap_success=False, initial_peers=initial_peers, cache_nearest=min_peers)
     model, config = get_model_config(tmp_path)
     tokenizer = AutoTokenizer.from_pretrained(TEST_MODEL_NAME)
 

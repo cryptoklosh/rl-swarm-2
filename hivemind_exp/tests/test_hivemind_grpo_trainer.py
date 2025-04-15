@@ -49,7 +49,7 @@ def get_model_config(tmp_path, max_steps):
 
 
 def create_dht_and_trainer(tmp_path, node, stage_data, max_steps=1, initial_peers=[]):
-    dht = hivemind.DHT(start=True, initial_peers=initial_peers, cache_nearest=2)
+    dht = hivemind.DHT(start=True, ensure_bootstrap_success=False, initial_peers=initial_peers, cache_nearest=2)
     model, config = get_model_config(tmp_path, max_steps=max_steps)
     tokenizer = AutoTokenizer.from_pretrained(TEST_MODEL_NAME)
     trainer = HivemindGRPOTrainer(
