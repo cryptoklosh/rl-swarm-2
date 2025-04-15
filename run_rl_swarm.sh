@@ -172,6 +172,7 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
     echo "Waiting for API key to become activated..."
     while true; do
         STATUS=$(curl -s "http://localhost:3000/api/get-api-key-status?orgId=$ORG_ID")
+        echo "API key status: $STATUS"
         if [[ "$STATUS" == "activated" ]]; then
             echo "API key is activated! Proceeding..."
             break
