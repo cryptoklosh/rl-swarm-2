@@ -60,17 +60,17 @@ ROOT_DIR="$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)"
 
 
 # Function to clean up the server process upon exit
-cleanup() {
-    echo_green ">> Shutting down trainer..."
+# cleanup() {
+#     echo_green ">> Shutting down trainer..."
 
-    # Remove modal credentials if they exist
-    rm -r $ROOT_DIR/modal-login/temp-data/*.json 2> /dev/null || true
+#     # Remove modal credentials if they exist
+#     rm -r $ROOT_DIR/modal-login/temp-data/*.json 2> /dev/null || true
 
-    # Kill all processes belonging to this script's process group
-    kill -- -$$ || true
+#     # Kill all processes belonging to this script's process group
+#     kill -- -$$ || true
 
-    exit 0
-}
+#     exit 0
+# }
 
 errnotify() {
     echo_red ">> An error was detected while running rl-swarm. See $ROOT/logs for full logs."
@@ -206,15 +206,6 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
             sleep 5
         fi
     done
-
-    ENV_FILE="$ROOT"/modal-login/.env
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        # macOS version
-        sed -i '' "3s/.*/SMART_CONTRACT_ADDRESS=$SWARM_CONTRACT/" "$ENV_FILE"
-    else
-        # Linux version
-        sed -i "3s/.*/SMART_CONTRACT_ADDRESS=$SWARM_CONTRACT/" "$ENV_FILE"
-    fi
 fi
 
 echo_green ">> Getting requirements..."
