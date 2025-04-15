@@ -54,19 +54,19 @@ echo_blue() {
 ROOT_DIR="$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)"
 
 # Function to clean up the server process upon exit
-cleanup() {
-    echo_green ">> Shutting down trainer..."
+# cleanup() {
+#     echo_green ">> Shutting down trainer..."
 
-    # Remove modal credentials if they exist
-    rm -r $ROOT_DIR/modal-login/temp-data/*.json 2> /dev/null || true
+#     # Remove modal credentials if they exist
+#     rm -r $ROOT_DIR/modal-login/temp-data/*.json 2> /dev/null || true
 
-    # Kill all processes belonging to this script's process group
-    kill -- -$$ || true
+#     # Kill all processes belonging to this script's process group
+#     kill -- -$$ || true
 
-    exit 0
-}
+#     exit 0
+# }
 
-trap cleanup EXIT
+# trap cleanup EXIT
 
 echo -e "\033[38;5;224m"
 cat << "EOF"
@@ -181,6 +181,7 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
         fi
     done
 
+<<<<<<< HEAD
     ENV_FILE="$ROOT"/modal-login/.env
     if [[ "$OSTYPE" == "darwin"* ]]; then
         # macOS version
@@ -189,6 +190,18 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
         # Linux version
         sed -i "3s/.*/SMART_CONTRACT_ADDRESS=$SWARM_CONTRACT/" "$ENV_FILE"
     fi
+=======
+    # # Function to clean up the server process
+    # cleanup() {
+    #     echo_green ">> Shutting down server..."
+    #     kill $SERVER_PID
+    #     rm -r modal-login/temp-data/*.json
+    #     exit 0
+    # }
+
+    # # Set up trap to catch Ctrl+C and call cleanup
+    # trap cleanup INT
+>>>>>>> 17e26e7 (Fix)
 fi
 
 echo_green ">> Getting requirements..."
