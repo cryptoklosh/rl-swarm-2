@@ -85,21 +85,21 @@ if [ "$CONNECT_TO_TESTNET" = "True" ]; then
     # Check if the yarn command exists; if not, install Yarn.
     source ~/.bashrc
     
-    # if ! command -v yarn >/dev/null 2>&1; then
-    #     # Detect Ubuntu (including WSL Ubuntu) and install Yarn accordingly
-    #     if grep -qi "ubuntu" /etc/os-release 2>/dev/null || uname -r | grep -qi "microsoft"; then
-    #         echo "Detected Ubuntu or WSL Ubuntu. Installing Yarn via apt..."
-    #         curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-    #         echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-    #         sudo apt update && sudo apt install -y yarn
-    #     else
-    #         echo "Yarn is not installed. Installing Yarn..."
-    #         curl -o- -L https://yarnpkg.com/install.sh | sh
-    #         echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"' >> ~/.bashrc
-    #         source ~/.bashrc
-    #     fi
-    # fi
-    # yarn install
+    if ! command -v yarn >/dev/null 2>&1; then
+        # Detect Ubuntu (including WSL Ubuntu) and install Yarn accordingly
+        if grep -qi "ubuntu" /etc/os-release 2>/dev/null || uname -r | grep -qi "microsoft"; then
+            echo "Detected Ubuntu or WSL Ubuntu. Installing Yarn via apt..."
+            curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+            echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+            sudo apt update && sudo apt install -y yarn
+        else
+            echo "Yarn is not installed. Installing Yarn..."
+            curl -o- -L https://yarnpkg.com/install.sh | sh
+            echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"' >> ~/.bashrc
+            source ~/.bashrc
+        fi
+    fi
+    yarn install
     yarn dev & # Run in background and suppress output
 
     SERVER_PID=$!  # Store the process ID
@@ -108,29 +108,27 @@ if [ "$CONNECT_TO_TESTNET" = "True" ]; then
     # open http://localhost:3000
     cd ..
 
-    if [ ! -f ${IDENTITY_PATH} ]; then
-        echo_green ">> Waiting for modal userData.json to be created..."
-        while [ ! -f "modal-login/temp-data/userData.json" ]; do
-            sleep 5  # Wait for 5 seconds before checking again
-        done
-        echo "Found userData.json. Proceeding..."
+    echo_green ">> Waiting for modal userData.json to be created..."
+    while [ ! -f "modal-login/temp-data/userData.json" ]; do
+        sleep 5  # Wait for 5 seconds before checking again
+    done
+    echo "Found userData.json. Proceeding..."
 
-        ORG_ID=$(awk 'BEGIN { FS = "\"" } !/^[ \t]*[{}]/ { print $(NF - 1); exit }' modal-login/temp-data/userData.json)
-        echo "Your ORG_ID is set to: $ORG_ID"
+    ORG_ID=$(awk 'BEGIN { FS = "\"" } !/^[ \t]*[{}]/ { print $(NF - 1); exit }' modal-login/temp-data/userData.json)
+    echo "Your ORG_ID is set to: $ORG_ID"
 
-        # Wait until the API key is activated by the client
-        echo "Waiting for API key to become activated..."
-        while true; do
-            STATUS=$(curl -s "http://localhost:3000/api/get-api-key-status?orgId=$ORG_ID")
-            if [[ "$STATUS" == "activated" ]]; then
-                echo "API key is activated! Proceeding..."
-                break
-            else
-                echo "Waiting for API key to be activated..."
-                sleep 5
-            fi
-        done
-    fi
+    # Wait until the API key is activated by the client
+    echo "Waiting for API key to become activated..."
+    while true; do
+        STATUS=$(curl -s "http://localhost:3000/api/get-api-key-status?orgId=$ORG_ID")
+        if [[ "$STATUS" == "activated" ]]; then
+            echo "API key is activated! Proceeding..."
+            break
+        else
+            echo "Waiting for API key to be activated..."
+            sleep 5
+        fi
+    done
 
     # Function to clean up the server process
     cleanup() {
@@ -148,9 +146,9 @@ pip_install() {
     pip3 install --break-system-packages --disable-pip-version-check -q -r "$1"
 }
 
-# echo_green ">> Getting requirements..."
-# pip_install "$ROOT"/requirements-hivemind.txt
-# pip_install "$ROOT"/requirements.txt
+echo_green ">> Getting requirements..."
+pip_install "$ROOT"/requirements-hivemind.txt
+pip_install "$ROOT"/requirements.txt
 
 if ! command -v nvidia-smi &> /dev/null; then
     # You don't have a NVIDIA GPU
@@ -186,8 +184,8 @@ echo_green ">> Good luck in the swarm!"
 echo_blue ">> Post about rl-swarm on X/twitter! --> https://tinyurl.com/swarmtweet"
 echo_blue ">> And remember to star the repo on GitHub! --> https://github.com/gensyn-ai/rl-swarm"
 
-sed -i -E 's/(startup_timeout: *float *= *)[0-9.]+/\1120/' $(python -c "import hivemind.p2p.p2p_daemon as m; print(m.__file__)")
-sed -i -E 's/await_ready=await_ready/await_ready=await_ready,timeout=600/' /usr/local/lib/python3.11/dist-packages/hivemind/dht/dht.py
+# sed -i -E 's/(startup_timeout: *float *= *)[0-9.]+/\1120/' $(python -c "import hivemind.p2p.p2p_daemon as m; print(m.__file__)")
+# sed -i -E 's/await_ready=await_ready/await_ready=await_ready,timeout=600/' /usr/local/lib/python3.11/dist-packages/hivemind/dht/dht.py
 if [ -n "$ORG_ID" ]; then
     python -m hivemind_exp.gsm8k.train_single_gpu \
         --hf_token "$HUGGINGFACE_ACCESS_TOKEN" \
