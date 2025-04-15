@@ -18,11 +18,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+  const headers_v = await headers();
   // Persist state across pages
   // https://accountkit.alchemy.com/react/ssr#persisting-the-account-state
   const initialState = cookieToInitialState(
     config,
-    await headers().get("cookie") ?? undefined,
+    headers_v.get("cookie") ?? undefined,
   );
 
   return (
