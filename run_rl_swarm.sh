@@ -140,6 +140,9 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
         fi
     fi
     yarn install
+    yarn upgrade
+    yarn add next@latest
+    yarn add viem@latest
     yarn dev & # Run in background and suppress output
 
     SERVER_PID=$!  # Store the process ID
