@@ -14,7 +14,8 @@ RUN --mount=type=cache,mode=0777,target=$YARN_CACHE_FOLDER yarn install && \
     yarn upgrade && \
     yarn add next@latest && \
     yarn add viem@latest && \
-    yarn add pino-pretty@latest
+    yarn add pino-pretty@latest && \
+    yarn add encoding@latest
 WORKDIR /root
 
 COPY requirements-hivemind.txt ./requirements-hivemind.txt
