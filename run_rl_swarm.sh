@@ -168,6 +168,7 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
     yarn build > "$ROOT/logs/yarn.log" 2>&1
     yarn start >> "$ROOT/logs/yarn.log" 2>&1 & # Run in background and log output
 
+
     SERVER_PID=$!  # Store the process ID
     echo "Started server process: $SERVER_PID"
     sleep 5
@@ -180,6 +181,15 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
     fi
 
     cd ..
+
+    function compile_root {
+        while true; do
+            curl -s "http://localhost:3000" > /dev/null
+            sleep 1m
+        done
+    }
+    compile_root &
+    trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
     
     echo_green ">> Waiting for modal userData.json to be created..."
     while [ ! -f "modal-login/temp-data/userData.json" ]; do
