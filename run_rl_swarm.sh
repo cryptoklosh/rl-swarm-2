@@ -272,6 +272,8 @@ echo_green ">> Good luck in the swarm!"
 echo_blue ">> Post about rl-swarm on X/twitter! --> https://tinyurl.com/swarmtweet"
 echo_blue ">> And remember to star the repo on GitHub! --> https://github.com/gensyn-ai/rl-swarm"
 
+
+cd ~
 sed -i -E 's/(startup_timeout: *float *= *)[0-9.]+/\1120/' $(python -c "import hivemind.p2p.p2p_daemon as m; print(m.__file__)")
 sed -i -E 's/\(await_ready=await_ready\)/\(await_ready=await_ready,timeout=600\)/' /usr/local/lib/python3.11/dist-packages/hivemind/dht/dht.py
 if [ -n "$ORG_ID" ]; then
