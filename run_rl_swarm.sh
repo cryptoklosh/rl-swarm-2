@@ -104,7 +104,7 @@ if [ "$CONNECT_TO_TESTNET" = "True" ]; then
     # yarn add next@latest
     # yarn add viem@latest
     # yarn add encoding@latest
-    yarn dev & # Run in background and suppress output
+    yarn dev > /dev/null 2>&1 & # Run in background and suppress output
 
     if [ ! -f $IDENTITY_PATH ]; then
         SERVER_PID=$!  # Store the process ID
@@ -113,14 +113,7 @@ if [ "$CONNECT_TO_TESTNET" = "True" ]; then
         # open http://localhost:3000
         cd ..
 
-        function compile_root {
-            while true; do
-                curl -s "http://localhost:3000" > /dev/null
-                sleep 1m
-            done
-        }
-        compile_root &
-        trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
+        curl -s "http://localhost:3000" > /dev/null
         
         echo_green ">> Waiting for modal userData.json to be created..."
         while [ ! -f "modal-login/temp-data/userData.json" ]; do
