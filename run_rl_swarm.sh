@@ -106,44 +106,45 @@ if [ "$CONNECT_TO_TESTNET" = "True" ]; then
     # yarn add encoding@latest
     yarn dev & # Run in background and suppress output
 
+    if [ ! -f $IDENTITY_PATH ]; then
+        SERVER_PID=$!  # Store the process ID
+        echo "Started server process: $SERVER_PID"
+        sleep 5
+        # open http://localhost:3000
+        cd ..
 
-    SERVER_PID=$!  # Store the process ID
-    echo "Started server process: $SERVER_PID"
-    sleep 5
-    # open http://localhost:3000
-    cd ..
-
-    function compile_root {
-        while true; do
-            curl -s "http://localhost:3000" > /dev/null
-            sleep 1m
+        function compile_root {
+            while true; do
+                curl -s "http://localhost:3000" > /dev/null
+                sleep 1m
+            done
+        }
+        compile_root &
+        trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
+        
+        echo_green ">> Waiting for modal userData.json to be created..."
+        while [ ! -f "modal-login/temp-data/userData.json" ]; do
+            sleep 5  # Wait for 5 seconds before checking again
         done
-    }
-    compile_root &
-    trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
-    
-    echo_green ">> Waiting for modal userData.json to be created..."
-    while [ ! -f "modal-login/temp-data/userData.json" ]; do
-        sleep 5  # Wait for 5 seconds before checking again
-    done
-    echo "Found userData.json. Proceeding..."
+        echo "Found userData.json. Proceeding..."
 
-    ORG_ID=$(awk 'BEGIN { FS = "\"" } !/^[ \t]*[{}]/ { print $(NF - 1); exit }' modal-login/temp-data/userData.json)
-    echo "Your ORG_ID is set to: $ORG_ID"
+        ORG_ID=$(awk 'BEGIN { FS = "\"" } !/^[ \t]*[{}]/ { print $(NF - 1); exit }' modal-login/temp-data/userData.json)
+        echo "Your ORG_ID is set to: $ORG_ID"
 
-    # Wait until the API key is activated by the client
-    echo "Waiting for API key to become activated..."
-    while true; do
-        STATUS=$(curl -s "http://localhost:3000/api/get-api-key-status?orgId=$ORG_ID")
-        echo "API key status: $STATUS"
-        if [[ "$STATUS" == "activated" ]]; then
-            echo "API key is activated! Proceeding..."
-            break
-        else
-            echo "Waiting for API key to be activated..."
-            sleep 5
-        fi
-    done
+        # Wait until the API key is activated by the client
+        echo "Waiting for API key to become activated..."
+        while true; do
+            STATUS=$(curl -s "http://localhost:3000/api/get-api-key-status?orgId=$ORG_ID")
+            echo "API key status: $STATUS"
+            if [[ "$STATUS" == "activated" ]]; then
+                echo "API key is activated! Proceeding..."
+                break
+            else
+                echo "Waiting for API key to be activated..."
+                sleep 5
+            fi
+        done
+    fi
 
     # # Function to clean up the server process
     # cleanup() {
