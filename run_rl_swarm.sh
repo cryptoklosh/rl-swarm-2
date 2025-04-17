@@ -168,6 +168,12 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
     yarn build > "$ROOT/logs/yarn.log" 2>&1
     yarn start >> "$ROOT/logs/yarn.log" 2>&1 & # Run in background and log output
 
+    if [ ! -f $IDENTITY_PATH ]; then
+        SERVER_PID=$!  # Store the process ID
+        echo "Started server process: $SERVER_PID"
+        sleep 5
+        # open http://localhost:3000
+        cd ..
 
     SERVER_PID=$!  # Store the process ID
     echo "Started server process: $SERVER_PID"
@@ -187,15 +193,7 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
             curl -s "http://localhost:3000" > /dev/null
             sleep 1m
         done
-    }
-    compile_root &
-    trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
-    
-    echo_green ">> Waiting for modal userData.json to be created..."
-    while [ ! -f "modal-login/temp-data/userData.json" ]; do
-        sleep 5  # Wait for 5 seconds before checking again
-    done
-    echo "Found userData.json. Proceeding..."
+        echo "Found userData.json. Proceeding..."
 
     if [ ! -f "${IDENTITY_PATH}"]; then
         echo_green ">> Waiting for modal userData.json to be created..."
