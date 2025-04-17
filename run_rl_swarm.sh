@@ -201,22 +201,25 @@ echo_blue ">> Post about rl-swarm on X/twitter! --> https://tinyurl.com/swarmtwe
 echo_blue ">> And remember to star the repo on GitHub! --> https://github.com/gensyn-ai/rl-swarm"
 
 cd ~
+ORG_ID=$(awk 'BEGIN { FS = "\"" } !/^[ \t]*[{}]/ { print $(NF - 1); exit }' modal-login/temp-data/userData.json)
+echo "Your ORG_ID is set to: $ORG_ID"
+
 sed -i -E 's/(startup_timeout: *float *= *)[0-9.]+/\1120/' $(python -c "import hivemind.p2p.p2p_daemon as m; print(m.__file__)")
 sed -i -E 's/\(await_ready=await_ready\)/\(await_ready=await_ready,timeout=600\)/' /usr/local/lib/python3.11/dist-packages/hivemind/dht/dht.py
-# if [ -n "$ORG_ID" ]; then
-python -m hivemind_exp.gsm8k.train_single_gpu \
-    --hf_token "$HUGGINGFACE_ACCESS_TOKEN" \
-    --identity_path "$IDENTITY_PATH" \
-    --modal_org_id "$ORG_ID" \
-    --config "$CONFIG_PATH"
-# else
-#     python -m hivemind_exp.gsm8k.train_single_gpu \
-#         --hf_token "$HUGGINGFACE_ACCESS_TOKEN" \
-#         --identity_path "$IDENTITY_PATH" \
-#         --public_maddr "$PUB_MULTI_ADDRS" \
-#         --initial_peers "$PEER_MULTI_ADDRS" \
-#         --host_maddr "$HOST_MULTI_ADDRS" \
-#         --config "$CONFIG_PATH"
-# fi
+if [ -n "$ORG_ID" ]; then
+    python -m hivemind_exp.gsm8k.train_single_gpu \
+        --hf_token "$HUGGINGFACE_ACCESS_TOKEN" \
+        --identity_path "$IDENTITY_PATH" \
+        --modal_org_id "$ORG_ID" \
+        --config "$CONFIG_PATH"
+else
+    python -m hivemind_exp.gsm8k.train_single_gpu \
+        --hf_token "$HUGGINGFACE_ACCESS_TOKEN" \
+        --identity_path "$IDENTITY_PATH" \
+        --public_maddr "$PUB_MULTI_ADDRS" \
+        --initial_peers "$PEER_MULTI_ADDRS" \
+        --host_maddr "$HOST_MULTI_ADDRS" \
+        --config "$CONFIG_PATH"
+fi
 
 wait  # Keep script running until Ctrl+C
