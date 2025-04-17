@@ -78,6 +78,9 @@ CONNECT_TO_TESTNET=True
 #     esac
 # done
 
+
+echo "Loading ..." > /root/logs/node_log.log
+
 if [ "$CONNECT_TO_TESTNET" = "True" ]; then
     # Run modal_login server.
     echo "Please login to create an Ethereum Server Wallet"
