@@ -22,7 +22,7 @@ from hivemind_exp.runner.gensyn.testnet_grpo_runner import (
 
 def main():
     try:
-        os.remove("/root/started.ok")
+        os.remove("/root/healthy.ok")
     except OSError:
         pass
     # Setup logging.
@@ -63,7 +63,7 @@ def main():
                     raise ValueError()
         except Exception as e:
             try:
-                os.remove("/root/started.ok")
+                os.remove("/root/healthy.ok")
             except OSError:
                 pass
             root_logger.exception(e)
