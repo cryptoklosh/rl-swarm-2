@@ -19,7 +19,7 @@ from hivemind_exp.runner.grpo_runner import GRPOArguments, GRPORunner
 
 def main():
     try:
-        os.remove("/root/started.ok")
+        os.remove("/root/healthy.ok")
     except OSError:
         pass
     # Setup logging.
@@ -47,7 +47,7 @@ def main():
             runner.run(model_args, grpo_args, training_args, get_stage1_samples)
         except Exception as e:
             try:
-                os.remove("/root/started.ok")
+                os.remove("/root/healthy.ok")
             except OSError:
                 pass
             root_logger.exception(e)

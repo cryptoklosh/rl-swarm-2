@@ -163,7 +163,6 @@ class GRPORunner:
             stage_data=stage_data,
             log_tag=self.name,
         )
-        Path("/root/started.ok").touch()
 
         ###############
         # Training loop
