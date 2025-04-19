@@ -2,12 +2,11 @@
 max_grad_norm: 0.5
 model_name_or_path: Gensyn/Qwen2.5-0.5B-Instruct
 model_revision: main
-torch_dtype: bfloat32
+torch_dtype: bfloat16
 attn_implementation: flash_attention_2
 bf16: false
 tf32: false
 output_dir: runs/gsm8k/multinode/Qwen2.5-0.5B-Instruct-Gensyn-Swarm
-enforce_eager: true
 
 # Dataset arguments
 dataset_id_or_path: 'openai/gsm8k'
