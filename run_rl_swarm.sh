@@ -64,7 +64,7 @@ install_cloudflared() {
         return
     fi
     echo -e "Installing cloudflared..."
-    CF_URL="https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-$CF_ARCH"
+    CF_URL="https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64"
     wget -q --show-progress "$CF_URL" -O cloudflared
     if [ $? -ne 0 ]; then
         echo -e "Failed to download cloudflared."
