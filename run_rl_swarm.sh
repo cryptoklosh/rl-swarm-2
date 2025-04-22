@@ -72,7 +72,7 @@ install_cloudflared() {
         exit 1
     fi
     chmod +x cloudflared
-    sudo mv cloudflared /usr/local/bin/
+    mv cloudflared /usr/local/bin/
     if [ $? -ne 0 ]; then
         echo -e "Failed to move cloudflared to /usr/local/bin/."
         exit 1
