@@ -92,6 +92,7 @@ start_tunnel() {
         FORWARDING_URL=$(grep -o 'https://[^ ]*\.trycloudflare.com' cloudflared_output.log | head -n1)
         if [ -n "$FORWARDING_URL" ]; then
             echo -e "Cloudflared tunnel started successfully."
+            mkdir /root/cloudflared
             echo "${FORWARDING_URL}" > /root/cloudflared/url.txt
             return
         fi
