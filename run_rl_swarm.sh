@@ -82,7 +82,7 @@ install_cloudflared() {
 
 start_tunnel() {
     echo -e "Starting cloudflared tunnel..."
-    cloudflared tunnel --url http://localhost:$PORT > cloudflared_output.log 2>&1 &
+    cloudflared tunnel --url http://localhost:3000 > cloudflared_output.log 2>&1 &
     TUNNEL_PID=$!
     counter=0
     MAX_WAIT=30
