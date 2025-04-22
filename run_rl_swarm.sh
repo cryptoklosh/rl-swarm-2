@@ -87,6 +87,7 @@ start_tunnel() {
     counter=0
     MAX_WAIT=30
     while [ $counter -lt $MAX_WAIT ]; do
+        echo -e "Waiting for cloudflared tunnel to start..."
         FORWARDING_URL=$(grep -o 'https://[^ ]*\.trycloudflare.com' cloudflared_output.log | head -n1)
         if [ -n "$FORWARDING_URL" ]; then
             echo -e "Cloudflared tunnel started successfully."
