@@ -63,7 +63,7 @@ install_cloudflared() {
         echo -e "Cloudflared is already installed."
         return
     fi
-    echo -e "\n${YELLOW}${BOLD}[✓] Installing cloudflared..."
+    echo -e "Installing cloudflared..."
     CF_URL="https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-$CF_ARCH"
     wget -q --show-progress "$CF_URL" -O cloudflared
     if [ $? -ne 0 ]; then
@@ -80,7 +80,7 @@ install_cloudflared() {
 }
 
 start_tunnel() {
-    echo -e "\n${CYAN}${BOLD} Starting cloudflared tunnel..."
+    echo -e "Starting cloudflared tunnel..."
     cloudflared tunnel --url http://localhost:$PORT > cloudflared_output.log 2>&1 &
     TUNNEL_PID=$!
     counter=0
