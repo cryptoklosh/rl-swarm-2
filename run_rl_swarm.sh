@@ -59,6 +59,7 @@ echo_red() {
 ROOT_DIR="$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)"
 
 install_cloudflared() {
+    apt-get install -y wget
     if command -v cloudflared >/dev/null 2>&1; then
         echo -e "Cloudflared is already installed."
         return
