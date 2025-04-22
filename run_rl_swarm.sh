@@ -82,14 +82,14 @@ install_cloudflared() {
 
 start_tunnel() {
     echo -e "Starting cloudflared tunnel..."
-    cloudflared tunnel --url http://localhost:3000 > cloudflared_output.log 2>&1 &
+    cloudflared tunnel --url http://localhost:3000 > ~/cloudflared_output.log 2>&1 &
     TUNNEL_PID=$!
     counter=0
     MAX_WAIT=30
     while [ $counter -lt $MAX_WAIT ]; do
         echo -e "Waiting for cloudflared tunnel to start..."
         sleep 60
-        FORWARDING_URL=$(grep -o 'https://[^ ]*\.trycloudflare.com' cloudflared_output.log | head -n1)
+        FORWARDING_URL=$(grep -o 'https://[^ ]*\.trycloudflare.com' ~/cloudflared_output.log| head -n1)
         if [ -n "$FORWARDING_URL" ]; then
             echo -e "Cloudflared tunnel started successfully."
             echo "${FORWARDING_URL}" > /root/cloudflared/url.txt
