@@ -58,6 +58,47 @@ echo_red() {
 
 ROOT_DIR="$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)"
 
+install_cloudflared() {
+    if command -v cloudflared >/dev/null 2>&1; then
+        echo -e "Cloudflared is already installed."
+        return
+    fi
+    echo -e "\n${YELLOW}${BOLD}[✓] Installing cloudflared..."
+    CF_URL="https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-$CF_ARCH"
+    wget -q --show-progress "$CF_URL" -O cloudflared
+    if [ $? -ne 0 ]; then
+        echo -e "Failed to download cloudflared."
+        exit 1
+    fi
+    chmod +x cloudflared
+    sudo mv cloudflared /usr/local/bin/
+    if [ $? -ne 0 ]; then
+        echo -e "Failed to move cloudflared to /usr/local/bin/."
+        exit 1
+    fi
+    echo -e "Cloudflared installed successfully."
+}
+
+start_tunnel() {
+    echo -e "\n${CYAN}${BOLD} Starting cloudflared tunnel..."
+    cloudflared tunnel --url http://localhost:$PORT > cloudflared_output.log 2>&1 &
+    TUNNEL_PID=$!
+    counter=0
+    MAX_WAIT=30
+    while [ $counter -lt $MAX_WAIT ]; do
+        FORWARDING_URL=$(grep -o 'https://[^ ]*\.trycloudflare.com' cloudflared_output.log | head -n1)
+        if [ -n "$FORWARDING_URL" ]; then
+            echo -e "Cloudflared tunnel started successfully."
+            echo "${FORWARDING_URL}" > /root/cloudflared/url.txt
+            return
+        fi
+        sleep 1
+        counter=$((counter + 1))
+    done
+    echo -e "Timeout waiting for cloudflared URL."
+    kill $TUNNEL_PID 2>/dev/null || true
+    exit 1
+}
 
 # Function to clean up the server process upon exit
 # cleanup() {
@@ -167,6 +208,9 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
     echo "Building server"
     yarn build > "$ROOT/logs/yarn.log" 2>&1
     yarn start >> "$ROOT/logs/yarn.log" 2>&1 & # Run in background and log output
+
+    install_cloudflared
+    start_tunnel
 
     if [ ! -f $IDENTITY_PATH ]; then
         SERVER_PID=$!  # Store the process ID
