@@ -279,7 +279,7 @@ echo "Your ORG_ID is set to: $ORG_ID"
 function get_last_log {
     while true; do
         sleep 5m
-        cat /root/logs/node_log.log | tail -30 > /root/logs/last_20.log
+        cat /root/logs/node_log.log | tail -40 > /root/logs/last_40.log
     done
 }
 
