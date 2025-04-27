@@ -1,6 +1,7 @@
 import gc
 import hashlib
 import logging
+import os
 from pathlib import Path
 import time
 from typing import Any
@@ -183,6 +184,7 @@ class HivemindGRPOTrainer:
             self.logger.info(
                 f"📉 Finished training round: {round_num} stage: {stage_num}"
             )
+            root = os.getenv("ROOT")
             Path(f"{root}/healthy.ok").touch()
 
         # Push to HF hub if desired
