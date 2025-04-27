@@ -142,7 +142,7 @@ class GRPORunner:
     def _get_animal_name(self, peer_id):
         animal_name = get_name_from_peer_id(peer_id)
         logger.info(f"🐱 Hello 🐈 [{animal_name}] 🦮 [{peer_id}]!")
-        root = os.environ("ROOT")
+        root = os.getenv("ROOT")
         with open(f'{root}/identity/node_name', 'w+') as f:
             f.write(str(animal_name))
         with open(f'{root}/identity/peer_id', 'w+') as f:
