@@ -213,7 +213,7 @@ if [ "$CONNECT_TO_TESTNET" = "True" ]; then
 fi
 
 pip_install() {
-    pip3 install --break-system-packages --disable-pip-version-check -q -r "$1"
+    pip3 install --disable-pip-version-check -q -r "$1"
 }
 
 echo_green ">> Getting requirements..."
