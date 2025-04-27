@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # General arguments
-ROOT=$PWD
+export ROOT=$PWD
 
 export PUB_MULTI_ADDRS
 export PEER_MULTI_ADDRS
@@ -158,10 +158,10 @@ if [ "$CONNECT_TO_TESTNET" = "True" ]; then
         fi
     fi
     yarn install
-    yarn upgrade
-    yarn add next@latest
-    yarn add viem@latest
-    yarn add encoding@latest
+#    yarn upgrade
+#    yarn add next@latest
+#    yarn add viem@latest
+#    yarn add encoding@latest
     yarn dev > /dev/null 2>&1 & # Run in background and suppress output
 
     install_cloudflared
@@ -269,7 +269,7 @@ get_last_log &
 trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
 
 sed -i -E 's/(startup_timeout: *float *= *)[0-9.]+/\1120/' $(python -c "import hivemind.p2p.p2p_daemon as m; print(m.__file__)")
-sed -i -E 's/\(await_ready=await_ready\)/\(await_ready=await_ready,timeout=600\)/' /usr/local/lib/python3.11/dist-packages/hivemind/dht/dht.py
+# sed -i -E 's/\(await_ready=await_ready\)/\(await_ready=await_ready,timeout=600\)/' /usr/local/lib/python3.11/dist-packages/hivemind/dht/dht.py
 if [ -n "$ORG_ID" ]; then
     python -m hivemind_exp.gsm8k.train_single_gpu \
         --hf_token "$HUGGINGFACE_ACCESS_TOKEN" \
