@@ -28,7 +28,7 @@ max_completion_length: 1024
 num_generations: 8
 use_vllm: true
 # vllm_device: "cuda:3"
-vllm_gpu_memory_utilization: 0.9
+vllm_gpu_memory_utilization: 0.95
 
 # Logging arguments
 logging_strategy: steps
