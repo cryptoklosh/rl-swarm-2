@@ -164,8 +164,8 @@ if [ "$CONNECT_TO_TESTNET" = "True" ]; then
 #    yarn add encoding@latest
     yarn dev > /dev/null 2>&1 & # Run in background and suppress output
 
-    install_cloudflared
-    start_tunnel
+    # install_cloudflared
+    # start_tunnel
 
     if [ ! -f $IDENTITY_PATH ]; then
         SERVER_PID=$!  # Store the process ID
