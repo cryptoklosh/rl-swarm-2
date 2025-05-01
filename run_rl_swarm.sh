@@ -124,44 +124,48 @@ cat << "EOF"
 
 EOF
 
-while true; do
-    echo -en $GREEN_TEXT
-    read -p ">> Would you like to connect to the Testnet? [Y/n] " yn
-    echo -en $RESET_TEXT
-    yn=${yn:-Y}  # Default to "Y" if the user presses Enter
-    case $yn in
-        [Yy]*)  CONNECT_TO_TESTNET=true && break ;;
-        [Nn]*)  CONNECT_TO_TESTNET=false && break ;;
-        *)  echo ">>> Please answer yes or no." ;;
-    esac
-done
+CONNECT_TO_TESTNET=true
+# while true; do
+#     echo -en $GREEN_TEXT
+#     read -p ">> Would you like to connect to the Testnet? [Y/n] " yn
+#     echo -en $RESET_TEXT
+#     yn=${yn:-Y}  # Default to "Y" if the user presses Enter
+#     case $yn in
+#         [Yy]*)  CONNECT_TO_TESTNET=true && break ;;
+#         [Nn]*)  CONNECT_TO_TESTNET=false && break ;;
+#         *)  echo ">>> Please answer yes or no." ;;
+#     esac
+# done
 
-while true; do
-    echo -en $GREEN_TEXT
-    read -p ">> Which swarm would you like to join (Math (A) or Math Hard (B))? [A/b] " ab
-    echo -en $RESET_TEXT
-    ab=${ab:-A}  # Default to "A" if the user presses Enter
-    case $ab in
-        [Aa]*)  USE_BIG_SWARM=false && break ;;
-        [Bb]*)  USE_BIG_SWARM=true && break ;;
-        *)  echo ">>> Please answer A or B." ;;
-    esac
-done
+USE_BIG_SWARM=false
+# while true; do
+#     echo -en $GREEN_TEXT
+#     read -p ">> Which swarm would you like to join (Math (A) or Math Hard (B))? [A/b] " ab
+#     echo -en $RESET_TEXT
+#     ab=${ab:-A}  # Default to "A" if the user presses Enter
+#     case $ab in
+#         [Aa]*)  USE_BIG_SWARM=false && break ;;
+#         [Bb]*)  USE_BIG_SWARM=true && break ;;
+#         *)  echo ">>> Please answer A or B." ;;
+#     esac
+# done
 if [ "$USE_BIG_SWARM" = true ]; then
     SWARM_CONTRACT="$BIG_SWARM_CONTRACT"
 else
     SWARM_CONTRACT="$SMALL_SWARM_CONTRACT"
 fi
-while true; do
-    echo -en $GREEN_TEXT
-    read -p ">> How many parameters (in billions)? [0.5, 1.5, 7, 32, 72] " pc
-    echo -en $RESET_TEXT
-    pc=${pc:-0.5}  # Default to "0.5" if the user presses Enter
-    case $pc in
-        0.5 | 1.5 | 7 | 32 | 72) PARAM_B=$pc && break ;;
-        *)  echo ">>> Please answer in [0.5, 1.5, 7, 32, 72]." ;;
-    esac
-done
+
+PARAM_B=0.5
+# while true; do
+#     echo -en $GREEN_TEXT
+#     read -p ">> How many parameters (in billions)? [0.5, 1.5, 7, 32, 72] " pc
+#     echo -en $RESET_TEXT
+#     pc=${pc:-0.5}  # Default to "0.5" if the user presses Enter
+#     case $pc in
+#         0.5 | 1.5 | 7 | 32 | 72) PARAM_B=$pc && break ;;
+#         *)  echo ">>> Please answer in [0.5, 1.5, 7, 32, 72]." ;;
+#     esac
+# done
 
 if [ "$CONNECT_TO_TESTNET" = true ]; then
     # Run modal_login server.
@@ -169,22 +173,37 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
     cd modal-login
     # Check if the yarn command exists; if not, install Yarn.
     source ~/.bashrc
-    
-    if ! command -v yarn >/dev/null 2>&1; then
-        # Detect Ubuntu (including WSL Ubuntu) and install Yarn accordingly
-        if grep -qi "ubuntu" /etc/os-release 2>/dev/null || uname -r | grep -qi "microsoft"; then
-            echo "Detected Ubuntu or WSL Ubuntu. Installing Yarn via apt..."
-            curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-            echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-            sudo apt update && sudo apt install -y yarn
-        else
-            echo "Yarn not found. Installing Yarn globally with npm (no profile edits)…"
-            # This lands in $NVM_DIR/versions/node/<ver>/bin which is already on PATH
-            npm install -g --silent yarn
-        fi
-    fi
-    yarn install
-    yarn dev > /dev/null 2>&1 & # Run in background and suppress output
+
+    # # Node.js + NVM setup
+    # if ! command -v node > /dev/null 2>&1; then
+    #     echo "Node.js not found. Installing NVM and latest Node.js..."
+    #     export NVM_DIR="$HOME/.nvm"
+    #     if [ ! -d "$NVM_DIR" ]; then
+    #         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+    #     fi
+    #     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    #     [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+    #     nvm install node
+    # else
+    #     echo "Node.js is already installed: $(node -v)"
+    # fi
+
+    # if ! command -v yarn > /dev/null 2>&1; then
+    #     # Detect Ubuntu (including WSL Ubuntu) and install Yarn accordingly
+    #     if grep -qi "ubuntu" /etc/os-release 2> /dev/null || uname -r | grep -qi "microsoft"; then
+    #         echo "Detected Ubuntu or WSL Ubuntu. Installing Yarn via apt..."
+    #         curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+    #         echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+    #         sudo apt update && sudo apt install -y yarn
+    #     else
+    #         echo "Yarn is not installed. Installing Yarn..."
+    #         curl -o- -L https://yarnpkg.com/install.sh | sh
+    #         echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"' >> ~/.bashrc
+    #         source ~/.bashrc
+    #     fi
+    # fi
+    # yarn install
+    yarn dev &
 
     install_cloudflared
     start_tunnel
@@ -200,21 +219,16 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
     echo "Started server process: $SERVER_PID"
     sleep 5
 
-    # Try to open the URL in the default browser
-    if open http://localhost:3000 2> /dev/null; then
-        echo_green ">> Successfully opened http://localhost:3000 in your default browser."
-    else
-        echo ">> Failed to open http://localhost:3000. Please open it manually."
-    fi
+    curl -s "http://localhost:3000" > /dev/null
+
+    # # Try to open the URL in the default browser
+    # if open http://localhost:3000 2> /dev/null; then
+    #     echo_green ">> Successfully opened http://localhost:3000 in your default browser."
+    # else
+    #     echo ">> Failed to open http://localhost:3000. Please open it manually."
+    # fi
 
     cd ..
-
-    function compile_root {
-        while true; do
-            curl -s "http://localhost:3000" > /dev/null
-            sleep 1m
-        done
-        echo "Found userData.json. Proceeding..."
 
     if [ ! -f "${IDENTITY_PATH}"]; then
         echo_green ">> Waiting for modal userData.json to be created..."
