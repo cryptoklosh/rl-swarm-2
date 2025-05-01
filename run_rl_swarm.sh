@@ -134,44 +134,48 @@ cat << "EOF"
 
 EOF
 
-while true; do
-    echo -en $GREEN_TEXT
-    read -p ">> Would you like to connect to the Testnet? [Y/n] " yn
-    echo -en $RESET_TEXT
-    yn=${yn:-Y}  # Default to "Y" if the user presses Enter
-    case $yn in
-        [Yy]*)  CONNECT_TO_TESTNET=true && break ;;
-        [Nn]*)  CONNECT_TO_TESTNET=false && break ;;
-        *)  echo ">>> Please answer yes or no." ;;
-    esac
-done
+CONNECT_TO_TESTNET=true
+# while true; do
+#     echo -en $GREEN_TEXT
+#     read -p ">> Would you like to connect to the Testnet? [Y/n] " yn
+#     echo -en $RESET_TEXT
+#     yn=${yn:-Y}  # Default to "Y" if the user presses Enter
+#     case $yn in
+#         [Yy]*)  CONNECT_TO_TESTNET=true && break ;;
+#         [Nn]*)  CONNECT_TO_TESTNET=false && break ;;
+#         *)  echo ">>> Please answer yes or no." ;;
+#     esac
+# done
 
-while true; do
-    echo -en $GREEN_TEXT
-    read -p ">> Which swarm would you like to join (Math (A) or Math Hard (B))? [A/b] " ab
-    echo -en $RESET_TEXT
-    ab=${ab:-A}  # Default to "A" if the user presses Enter
-    case $ab in
-        [Aa]*)  USE_BIG_SWARM=false && break ;;
-        [Bb]*)  USE_BIG_SWARM=true && break ;;
-        *)  echo ">>> Please answer A or B." ;;
-    esac
-done
+USE_BIG_SWARM=false
+# while true; do
+#     echo -en $GREEN_TEXT
+#     read -p ">> Which swarm would you like to join (Math (A) or Math Hard (B))? [A/b] " ab
+#     echo -en $RESET_TEXT
+#     ab=${ab:-A}  # Default to "A" if the user presses Enter
+#     case $ab in
+#         [Aa]*)  USE_BIG_SWARM=false && break ;;
+#         [Bb]*)  USE_BIG_SWARM=true && break ;;
+#         *)  echo ">>> Please answer A or B." ;;
+#     esac
+# done
 if [ "$USE_BIG_SWARM" = true ]; then
     SWARM_CONTRACT="$BIG_SWARM_CONTRACT"
 else
     SWARM_CONTRACT="$SMALL_SWARM_CONTRACT"
 fi
-while true; do
-    echo -en $GREEN_TEXT
-    read -p ">> How many parameters (in billions)? [0.5, 1.5, 7, 32, 72] " pc
-    echo -en $RESET_TEXT
-    pc=${pc:-0.5}  # Default to "0.5" if the user presses Enter
-    case $pc in
-        0.5 | 1.5 | 7 | 32 | 72) PARAM_B=$pc && break ;;
-        *)  echo ">>> Please answer in [0.5, 1.5, 7, 32, 72]." ;;
-    esac
-done
+
+PARAM_B=0.5
+# while true; do
+#     echo -en $GREEN_TEXT
+#     read -p ">> How many parameters (in billions)? [0.5, 1.5, 7, 32, 72] " pc
+#     echo -en $RESET_TEXT
+#     pc=${pc:-0.5}  # Default to "0.5" if the user presses Enter
+#     case $pc in
+#         0.5 | 1.5 | 7 | 32 | 72) PARAM_B=$pc && break ;;
+#         *)  echo ">>> Please answer in [0.5, 1.5, 7, 32, 72]." ;;
+#     esac
+# done
 
 # Create logs directory if it doesn't exist
 mkdir -p "$ROOT/logs"
@@ -225,21 +229,16 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
     echo "Started server process: $SERVER_PID"
     sleep 5
 
-    # Try to open the URL in the default browser
-    if open http://localhost:3000 2> /dev/null; then
-        echo_green ">> Successfully opened http://localhost:3000 in your default browser."
-    else
-        echo ">> Failed to open http://localhost:3000. Please open it manually."
-    fi
+    curl -s "http://localhost:3000" > /dev/null
+
+    # # Try to open the URL in the default browser
+    # if open http://localhost:3000 2> /dev/null; then
+    #     echo_green ">> Successfully opened http://localhost:3000 in your default browser."
+    # else
+    #     echo ">> Failed to open http://localhost:3000. Please open it manually."
+    # fi
 
     cd ..
-
-    function compile_root {
-        while true; do
-            curl -s "http://localhost:3000" > /dev/null
-            sleep 1m
-        done
-        echo "Found userData.json. Proceeding..."
 
     if [ ! -f "${IDENTITY_PATH}"]; then
         echo_green ">> Waiting for modal userData.json to be created..."
