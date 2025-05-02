@@ -26,8 +26,8 @@ WORKDIR /root
 COPY requirements-$CPU_GPU.txt requirements-$CPU_GPU.txt
 RUN --mount=type=cache,target=/root/.cache/pip pip3 install -r requirements-$CPU_GPU.txt --break-system-packages
 
-RUN wget "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64" -O /usr/local/bin/cloudflared && \
-chmod +x /usr/local/bin/cloudflared
+ADD https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 /usr/local/bin/cloudflared
+RUN chmod +x /usr/local/bin/cloudflared
 
 COPY . .
 
