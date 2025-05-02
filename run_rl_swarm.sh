@@ -214,7 +214,7 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
     yarn start >> "$ROOT/logs/yarn.log" 2>&1 & # Run in background and log output
 
 # install_cloudflared
-start_tunnel
+# start_tunnel
 
 if [ ! -f $IDENTITY_PATH ]; then
     SERVER_PID=$!  # Store the process ID
