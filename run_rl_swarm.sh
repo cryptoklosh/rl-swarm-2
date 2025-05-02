@@ -213,38 +213,41 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
     yarn build > "$ROOT/logs/yarn.log" 2>&1
     yarn start >> "$ROOT/logs/yarn.log" 2>&1 & # Run in background and log output
 
-    # install_cloudflared
-    start_tunnel
+# install_cloudflared
+start_tunnel
 
-    if [ ! -f $IDENTITY_PATH ]; then
-        SERVER_PID=$!  # Store the process ID
-        echo "Started server process: $SERVER_PID"
-        sleep 5
-        # open http://localhost:3000
-        cd ..
-
+if [ ! -f $IDENTITY_PATH ]; then
     SERVER_PID=$!  # Store the process ID
     echo "Started server process: $SERVER_PID"
     sleep 5
-
-    curl -s "http://localhost:3000" > /dev/null
-
-    # # Try to open the URL in the default browser
-    # if open http://localhost:3000 2> /dev/null; then
-    #     echo_green ">> Successfully opened http://localhost:3000 in your default browser."
-    # else
-    #     echo ">> Failed to open http://localhost:3000. Please open it manually."
-    # fi
-
+    # open http://localhost:3000
     cd ..
 
-    if [ ! -f "${IDENTITY_PATH}"]; then
-        echo_green ">> Waiting for modal userData.json to be created..."
-        while [ ! -f "modal-login/temp-data/userData.json" ]; do
-            sleep 5  # Wait for 5 seconds before checking again
-        done
-        echo "Found userData.json. Proceeding..."
+SERVER_PID=$!  # Store the process ID
+echo "Started server process: $SERVER_PID"
+sleep 5
 
+<<<<<<< HEAD
+=======
+curl -s "http://localhost:3000" > /dev/null
+
+# # Try to open the URL in the default browser
+# if open http://localhost:3000 2> /dev/null; then
+#     echo_green ">> Successfully opened http://localhost:3000 in your default browser."
+# else
+#     echo ">> Failed to open http://localhost:3000. Please open it manually."
+# fi
+
+cd ..
+
+if [ ! -f "${IDENTITY_PATH}"]; then
+    echo_green ">> Waiting for modal userData.json to be created..."
+    while [ ! -f "modal-login/temp-data/userData.json" ]; do
+        sleep 5  # Wait for 5 seconds before checking again
+    done
+    echo "Found userData.json. Proceeding..."
+
+>>>>>>> fba614b (Fix)
     # Wait until the API key is activated by the client
     echo "Waiting for API key to become activated..."
     while true; do
@@ -258,6 +261,18 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
             sleep 5
         fi
     done
+<<<<<<< HEAD
+=======
+fi
+
+ENV_FILE="$ROOT"/modal-login/.env
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS version
+    sed -i '' "3s/.*/SMART_CONTRACT_ADDRESS=$SWARM_CONTRACT/" "$ENV_FILE"
+else
+    # Linux version
+    sed -i "3s/.*/SMART_CONTRACT_ADDRESS=$SWARM_CONTRACT/" "$ENV_FILE"
+>>>>>>> fba614b (Fix)
 fi
 
 echo_green ">> Getting requirements..."
