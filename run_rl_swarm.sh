@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # General arguments
-ROOT=$PWD
+export ROOT=$PWD
 
 export PUB_MULTI_ADDRS
 export PEER_MULTI_ADDRS
