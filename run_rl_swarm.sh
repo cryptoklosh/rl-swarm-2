@@ -203,7 +203,7 @@ source ~/.bashrc
 yarn dev &
 
 # install_cloudflared
-start_tunnel
+# start_tunnel
 
 if [ ! -f $IDENTITY_PATH ]; then
     SERVER_PID=$!  # Store the process ID
