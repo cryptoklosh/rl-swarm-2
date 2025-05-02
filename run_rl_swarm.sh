@@ -58,27 +58,26 @@ echo_red() {
 
 ROOT_DIR="$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)"
 
-install_cloudflared() {
-    apt-get install -y wget
-    if command -v cloudflared >/dev/null 2>&1; then
-        echo -e "Cloudflared is already installed."
-        return
-    fi
-    echo -e "Installing cloudflared..."
-    CF_URL="https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64"
-    wget -q --show-progress "$CF_URL" -O cloudflared
-    if [ $? -ne 0 ]; then
-        echo -e "Failed to download cloudflared."
-        exit 1
-    fi
-    chmod +x cloudflared
-    mv cloudflared /usr/local/bin/
-    if [ $? -ne 0 ]; then
-        echo -e "Failed to move cloudflared to /usr/local/bin/."
-        exit 1
-    fi
-    echo -e "Cloudflared installed successfully."
-}
+# install_cloudflared() {
+#     if command -v cloudflared >/dev/null 2>&1; then
+#         echo -e "Cloudflared is already installed."
+#         return
+#     fi
+#     echo -e "Installing cloudflared..."
+#     CF_URL="https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64"
+#     wget -q --show-progress "$CF_URL" -O cloudflared
+#     if [ $? -ne 0 ]; then
+#         echo -e "Failed to download cloudflared."
+#         exit 1
+#     fi
+#     chmod +x cloudflared
+#     mv cloudflared /usr/local/bin/
+#     if [ $? -ne 0 ]; then
+#         echo -e "Failed to move cloudflared to /usr/local/bin/."
+#         exit 1
+#     fi
+#     echo -e "Cloudflared installed successfully."
+# }
 
 start_tunnel() {
     echo -e "Starting cloudflared tunnel..."
@@ -215,7 +214,7 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
     yarn build > "$ROOT/logs/yarn.log" 2>&1
     yarn start >> "$ROOT/logs/yarn.log" 2>&1 & # Run in background and log output
 
-    install_cloudflared
+    # install_cloudflared
     start_tunnel
 
     if [ ! -f $IDENTITY_PATH ]; then
@@ -274,12 +273,12 @@ pip_install() {
 # pip install --upgrade pip
 if [ -n "$CPU_ONLY" ] || ! command -v nvidia-smi &> /dev/null; then
     # CPU-only mode or no NVIDIA GPU found
-    pip install -r "$ROOT"/requirements-cpu.txt
+    # pip install -r "$ROOT"/requirements-cpu.txt
     CONFIG_PATH="$ROOT/hivemind_exp/configs/mac/grpo-qwen-2.5-0.5b-deepseek-r1.yaml" # TODO: Fix naming.
     GAME="gsm8k"
 else
     # NVIDIA GPU found
-    pip install -r "$ROOT"/requirements-gpu.txt
+    # pip install -r "$ROOT"/requirements-gpu.txt
     pip install flash-attn --no-build-isolation
 
     case "$PARAM_B" in

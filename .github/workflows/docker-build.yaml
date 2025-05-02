@@ -21,12 +21,21 @@ jobs:
           registry: ${{ vars.DOCKER__REGISTRY }}
           username: ${{ secrets.DOCKER__USERNAME }}
           password: ${{ secrets.DOCKER__PASSWORD }}
-      - name: Build and Push
+      - name: Build and Push [CPU]
         uses: docker/build-push-action@v6
         with:
           push: true
           context: .
           platforms: linux/amd64
-          tags: ${{ vars.DOCKER__REGISTRY }}/node-gensyn:${{ inputs.tag }}
-          cache-from: type=registry,ref=${{ vars.DOCKER__REGISTRY }}/node-gensyn:cache
-          cache-to: type=registry,ref=${{ vars.DOCKER__REGISTRY }}/node-gensyn:cache,compression=zstd,mode=max
+          tags: ${{ vars.DOCKER__REGISTRY }}/node-gensyn:${{ inputs.tag }}-cpu
+          cache-from: type=registry,ref=${{ vars.DOCKER__REGISTRY }}/node-gensyn:cache-cpu
+          cache-to: type=registry,ref=${{ vars.DOCKER__REGISTRY }}/node-gensyn:cache-cpu,compression=zstd,mode=max
+      - name: Build and Push [GPU]
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          context: .
+          platforms: linux/amd64
+          tags: ${{ vars.DOCKER__REGISTRY }}/node-gensyn:${{ inputs.tag }}-gpu
+          cache-from: type=registry,ref=${{ vars.DOCKER__REGISTRY }}/node-gensyn:cache-gpu
+          cache-to: type=registry,ref=${{ vars.DOCKER__REGISTRY }}/node-gensyn:cache-gpu,compression=zstd,mode=max

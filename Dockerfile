@@ -1,8 +1,10 @@
 # syntax = docker/dockerfile:1.4
 
 FROM debian:12
+ARG CPU_GPU
+
 WORKDIR /root
-RUN apt-get update && apt-get install -y python3 python-is-python3 python3-venv python3-pip nodejs npm curl
+RUN apt-get update && apt-get install -y wget python3 python-is-python3 python3-venv python3-pip nodejs npm curl
 RUN npm install --global yarn
 
 WORKDIR /root/modal-login
@@ -18,10 +20,12 @@ RUN --mount=type=cache,mode=0777,target=$YARN_CACHE_FOLDER yarn install && \
     yarn add encoding@latest
 WORKDIR /root
 
-COPY requirements-hivemind.txt ./requirements-hivemind.txt
-COPY requirements.txt ./requirements.txt
-RUN --mount=type=cache,target=/root/.cache/pip pip3 install -r requirements-hivemind.txt --break-system-packages
-RUN --mount=type=cache,target=/root/.cache/pip pip3 install -r requirements.txt --break-system-packages
+COPY requirements-$CPU_GPU.txt ./requirements.txt
+RUN --mount=type=cache,target=/root/.cache/pip pip3 install -r requirements-$CPU_GPU.txt --break-system-packages
+
+
+RUN wget "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64" -O /usr/local/bin/cloudflared && \
+chmod +x /usr/local/bin/cloudflared
 
 COPY . .
 
