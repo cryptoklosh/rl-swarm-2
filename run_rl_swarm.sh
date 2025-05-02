@@ -165,99 +165,97 @@ PARAM_B=0.5
 #     esac
 # done
 
-if [ "$CONNECT_TO_TESTNET" = true ]; then
-    # Run modal_login server.
-    echo "Please login to create an Ethereum Server Wallet"
-    cd modal-login
-    # Check if the yarn command exists; if not, install Yarn.
-    source ~/.bashrc
+# Run modal_login server.
+echo "Please login to create an Ethereum Server Wallet"
+cd modal-login
+# Check if the yarn command exists; if not, install Yarn.
+source ~/.bashrc
 
-    # # Node.js + NVM setup
-    # if ! command -v node > /dev/null 2>&1; then
-    #     echo "Node.js not found. Installing NVM and latest Node.js..."
-    #     export NVM_DIR="$HOME/.nvm"
-    #     if [ ! -d "$NVM_DIR" ]; then
-    #         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-    #     fi
-    #     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    #     [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-    #     nvm install node
-    # else
-    #     echo "Node.js is already installed: $(node -v)"
-    # fi
+# # Node.js + NVM setup
+# if ! command -v node > /dev/null 2>&1; then
+#     echo "Node.js not found. Installing NVM and latest Node.js..."
+#     export NVM_DIR="$HOME/.nvm"
+#     if [ ! -d "$NVM_DIR" ]; then
+#         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+#     fi
+#     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+#     [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+#     nvm install node
+# else
+#     echo "Node.js is already installed: $(node -v)"
+# fi
 
-    # if ! command -v yarn > /dev/null 2>&1; then
-    #     # Detect Ubuntu (including WSL Ubuntu) and install Yarn accordingly
-    #     if grep -qi "ubuntu" /etc/os-release 2> /dev/null || uname -r | grep -qi "microsoft"; then
-    #         echo "Detected Ubuntu or WSL Ubuntu. Installing Yarn via apt..."
-    #         curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-    #         echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-    #         sudo apt update && sudo apt install -y yarn
-    #     else
-    #         echo "Yarn is not installed. Installing Yarn..."
-    #         curl -o- -L https://yarnpkg.com/install.sh | sh
-    #         echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"' >> ~/.bashrc
-    #         source ~/.bashrc
-    #     fi
-    # fi
-    # yarn install
-    yarn dev &
+# if ! command -v yarn > /dev/null 2>&1; then
+#     # Detect Ubuntu (including WSL Ubuntu) and install Yarn accordingly
+#     if grep -qi "ubuntu" /etc/os-release 2> /dev/null || uname -r | grep -qi "microsoft"; then
+#         echo "Detected Ubuntu or WSL Ubuntu. Installing Yarn via apt..."
+#         curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+#         echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+#         sudo apt update && sudo apt install -y yarn
+#     else
+#         echo "Yarn is not installed. Installing Yarn..."
+#         curl -o- -L https://yarnpkg.com/install.sh | sh
+#         echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"' >> ~/.bashrc
+#         source ~/.bashrc
+#     fi
+# fi
+# yarn install
+yarn dev &
 
-    # install_cloudflared
-    start_tunnel
+# install_cloudflared
+start_tunnel
 
-    if [ ! -f $IDENTITY_PATH ]; then
-        SERVER_PID=$!  # Store the process ID
-        echo "Started server process: $SERVER_PID"
-        sleep 5
-        # open http://localhost:3000
-        cd ..
-
+if [ ! -f $IDENTITY_PATH ]; then
     SERVER_PID=$!  # Store the process ID
     echo "Started server process: $SERVER_PID"
     sleep 5
-
-    curl -s "http://localhost:3000" > /dev/null
-
-    # # Try to open the URL in the default browser
-    # if open http://localhost:3000 2> /dev/null; then
-    #     echo_green ">> Successfully opened http://localhost:3000 in your default browser."
-    # else
-    #     echo ">> Failed to open http://localhost:3000. Please open it manually."
-    # fi
-
+    # open http://localhost:3000
     cd ..
 
-    if [ ! -f "${IDENTITY_PATH}"]; then
-        echo_green ">> Waiting for modal userData.json to be created..."
-        while [ ! -f "modal-login/temp-data/userData.json" ]; do
-            sleep 5  # Wait for 5 seconds before checking again
-        done
-        echo "Found userData.json. Proceeding..."
+SERVER_PID=$!  # Store the process ID
+echo "Started server process: $SERVER_PID"
+sleep 5
 
-        # Wait until the API key is activated by the client
-        echo "Waiting for API key to become activated..."
-        while true; do
-            STATUS=$(curl -s "http://localhost:3000/api/get-api-key-status?orgId=$ORG_ID")
-            echo "API key status: $STATUS"
-            if [[ "$STATUS" == "activated" ]]; then
-                echo "API key is activated! Proceeding..."
-                break
-            else
-                echo "Waiting for API key to be activated..."
-                sleep 5
-            fi
-        done
-    fi
+curl -s "http://localhost:3000" > /dev/null
 
-    ENV_FILE="$ROOT"/modal-login/.env
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        # macOS version
-        sed -i '' "3s/.*/SMART_CONTRACT_ADDRESS=$SWARM_CONTRACT/" "$ENV_FILE"
-    else
-        # Linux version
-        sed -i "3s/.*/SMART_CONTRACT_ADDRESS=$SWARM_CONTRACT/" "$ENV_FILE"
-    fi
+# # Try to open the URL in the default browser
+# if open http://localhost:3000 2> /dev/null; then
+#     echo_green ">> Successfully opened http://localhost:3000 in your default browser."
+# else
+#     echo ">> Failed to open http://localhost:3000. Please open it manually."
+# fi
+
+cd ..
+
+if [ ! -f "${IDENTITY_PATH}"]; then
+    echo_green ">> Waiting for modal userData.json to be created..."
+    while [ ! -f "modal-login/temp-data/userData.json" ]; do
+        sleep 5  # Wait for 5 seconds before checking again
+    done
+    echo "Found userData.json. Proceeding..."
+
+    # Wait until the API key is activated by the client
+    echo "Waiting for API key to become activated..."
+    while true; do
+        STATUS=$(curl -s "http://localhost:3000/api/get-api-key-status?orgId=$ORG_ID")
+        echo "API key status: $STATUS"
+        if [[ "$STATUS" == "activated" ]]; then
+            echo "API key is activated! Proceeding..."
+            break
+        else
+            echo "Waiting for API key to be activated..."
+            sleep 5
+        fi
+    done
+fi
+
+ENV_FILE="$ROOT"/modal-login/.env
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS version
+    sed -i '' "3s/.*/SMART_CONTRACT_ADDRESS=$SWARM_CONTRACT/" "$ENV_FILE"
+else
+    # Linux version
+    sed -i "3s/.*/SMART_CONTRACT_ADDRESS=$SWARM_CONTRACT/" "$ENV_FILE"
 fi
 
 echo_green ">> Getting requirements..."
