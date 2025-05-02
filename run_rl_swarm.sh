@@ -271,7 +271,7 @@ pip_install() {
 # pip_install "$ROOT"/requirements-hivemind.txt
 # pip_install "$ROOT"/requirements.txt
 
-pip install --upgrade pip
+# pip install --upgrade pip
 if [ -n "$CPU_ONLY" ] || ! command -v nvidia-smi &> /dev/null; then
     # CPU-only mode or no NVIDIA GPU found
     pip install -r "$ROOT"/requirements-cpu.txt
