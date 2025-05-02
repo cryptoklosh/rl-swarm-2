@@ -37,6 +37,7 @@ jobs:
         with:
           push: true
           context: .
+          build-args:
             CPU_GPU=gpu
           platforms: linux/amd64
           tags: ${{ vars.DOCKER__REGISTRY }}/node-gensyn:${{ inputs.tag }}-gpu
