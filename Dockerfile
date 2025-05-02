@@ -7,7 +7,7 @@ WORKDIR /root
 ADD https://deb.nodesource.com/setup_23.x nodesource_setup.sh
 RUN chmod +x nodesource_setup.sh
 RUN ./nodesource_setup.sh
-RUN apt-get update && apt-get install -y wget curl python3 python-is-python3 python3-venv python3-pip nodejs npm 
+RUN apt-get update && apt-get install -y wget curl python3 python-is-python3 python3-venv python3-pip nodejs 
 RUN npm install --global yarn
 
 WORKDIR /root/modal-login
