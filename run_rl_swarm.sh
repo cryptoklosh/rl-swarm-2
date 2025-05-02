@@ -169,7 +169,7 @@ PARAM_B=0.5
 echo "Please login to create an Ethereum Server Wallet"
 cd modal-login
 # Check if the yarn command exists; if not, install Yarn.
-source ~/.bashrc
+# source ~/.bashrc
 
 # # Node.js + NVM setup
 # if ! command -v node > /dev/null 2>&1; then
@@ -204,13 +204,6 @@ yarn dev &
 
 # install_cloudflared
 # start_tunnel
-
-if [ ! -f $IDENTITY_PATH ]; then
-    SERVER_PID=$!  # Store the process ID
-    echo "Started server process: $SERVER_PID"
-    sleep 5
-    # open http://localhost:3000
-    cd ..
 
 SERVER_PID=$!  # Store the process ID
 echo "Started server process: $SERVER_PID"
