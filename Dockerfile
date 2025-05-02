@@ -4,6 +4,7 @@ FROM debian:12
 ARG CPU_GPU
 
 WORKDIR /root
+RUN curl https://deb.nodesource.com/setup_23.x | bash -
 RUN apt-get update && apt-get install -y wget python3 python-is-python3 python3-venv python3-pip nodejs npm curl
 RUN npm install --global yarn
 
