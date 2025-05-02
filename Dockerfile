@@ -21,11 +21,10 @@ RUN --mount=type=cache,mode=0777,target=$YARN_CACHE_FOLDER yarn install && \
     yarn add viem@latest && \
     yarn add pino-pretty@latest && \
     yarn add encoding@latest
+
 WORKDIR /root
-
-COPY requirements-$CPU_GPU.txt ./requirements.txt
+COPY requirements-$CPU_GPU.txt requirements-$CPU_GPU.txt
 RUN --mount=type=cache,target=/root/.cache/pip pip3 install -r requirements-$CPU_GPU.txt --break-system-packages
-
 
 RUN wget "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64" -O /usr/local/bin/cloudflared && \
 chmod +x /usr/local/bin/cloudflared
