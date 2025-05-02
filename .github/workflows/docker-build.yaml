@@ -26,6 +26,8 @@ jobs:
         with:
           push: true
           context: .
+          build-args:
+            CPU_GPU=cpu
           platforms: linux/amd64
           tags: ${{ vars.DOCKER__REGISTRY }}/node-gensyn:${{ inputs.tag }}-cpu
           cache-from: type=registry,ref=${{ vars.DOCKER__REGISTRY }}/node-gensyn:cache-cpu
@@ -35,6 +37,7 @@ jobs:
         with:
           push: true
           context: .
+            CPU_GPU=gpu
           platforms: linux/amd64
           tags: ${{ vars.DOCKER__REGISTRY }}/node-gensyn:${{ inputs.tag }}-gpu
           cache-from: type=registry,ref=${{ vars.DOCKER__REGISTRY }}/node-gensyn:cache-gpu
