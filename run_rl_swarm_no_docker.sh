@@ -30,6 +30,9 @@ HOST_MULTI_ADDRS=${HOST_MULTI_ADDRS:-$DEFAULT_HOST_MULTI_ADDRS}
 DEFAULT_IDENTITY_PATH="$ROOT"/identity/swarm.pem
 IDENTITY_PATH=${IDENTITY_PATH:-$DEFAULT_IDENTITY_PATH}
 
+SMALL_SWARM_CONTRACT="0x69C6e1D608ec64885E7b185d39b04B491a71768C"
+BIG_SWARM_CONTRACT="0x6947c6E196a48B77eFa9331EC1E3e45f3Ee5Fd58"
+
 # Will ignore any visible GPUs if set.
 CPU_ONLY=${CPU_ONLY:-""}
 
@@ -95,57 +98,99 @@ start_tunnel() {
 }
 
 # Function to clean up the server process upon exit
-cleanup() {
-    echo_green ">> Shutting down trainer..."
+# cleanup() {
+#     echo_green ">> Shutting down trainer..."
 
-    # Remove modal credentials if they exist
-    rm -r $ROOT_DIR/modal-login/temp-data/*.json 2> /dev/null || true
+#     # Remove modal credentials if they exist
+#     rm -r $ROOT_DIR/modal-login/temp-data/*.json 2> /dev/null || true
 
-    # Kill all processes belonging to this script's process group
-    kill -- -$$ || true
+#     # Kill all processes belonging to this script's process group
+#     kill -- -$$ || true
 
-    exit 0
-}
+#     exit 0
+# }
 
-trap cleanup EXIT
+# trap cleanup EXIT
 
 echo -e "\033[38;5;224m"
 cat << "EOF"
-    ██████  ██            ███████ ██     ██  █████  ██████  ███    ███ 
-    ██   ██ ██            ██      ██     ██ ██   ██ ██   ██ ████  ████ 
-    ██████  ██      █████ ███████ ██  █  ██ ███████ ██████  ██ ████ ██ 
-    ██   ██ ██                 ██ ██ ███ ██ ██   ██ ██   ██ ██  ██  ██ 
-    ██   ██ ███████       ███████  ███ ███  ██   ██ ██   ██ ██      ██ 
-    
-    From Gensyn  
-                                                                
+    ██████  ██            ███████ ██     ██  █████  ██████  ███    ███
+    ██   ██ ██            ██      ██     ██ ██   ██ ██   ██ ████  ████
+    ██████  ██      █████ ███████ ██  █  ██ ███████ ██████  ██ ████ ██
+    ██   ██ ██                 ██ ██ ███ ██ ██   ██ ██   ██ ██  ██  ██
+    ██   ██ ███████       ███████  ███ ███  ██   ██ ██   ██ ██      ██
+
+    From Gensyn
+
 EOF
 
-CONNECT_TO_TESTNET=True
+CONNECT_TO_TESTNET=true
 # while true; do
 #     echo -en $GREEN_TEXT
 #     read -p ">> Would you like to connect to the Testnet? [Y/n] " yn
 #     echo -en $RESET_TEXT
 #     yn=${yn:-Y}  # Default to "Y" if the user presses Enter
 #     case $yn in
-#         [Yy]*)  CONNECT_TO_TESTNET=True && break ;;
-#         [Nn]*)  CONNECT_TO_TESTNET=False && break ;;
+#         [Yy]*)  CONNECT_TO_TESTNET=true && break ;;
+#         [Nn]*)  CONNECT_TO_TESTNET=false && break ;;
 #         *)  echo ">>> Please answer yes or no." ;;
 #     esac
 # done
 
+USE_BIG_SWARM=false
+# while true; do
+#     echo -en $GREEN_TEXT
+#     read -p ">> Which swarm would you like to join (Math (A) or Math Hard (B))? [A/b] " ab
+#     echo -en $RESET_TEXT
+#     ab=${ab:-A}  # Default to "A" if the user presses Enter
+#     case $ab in
+#         [Aa]*)  USE_BIG_SWARM=false && break ;;
+#         [Bb]*)  USE_BIG_SWARM=true && break ;;
+#         *)  echo ">>> Please answer A or B." ;;
+#     esac
+# done
+if [ "$USE_BIG_SWARM" = true ]; then
+    SWARM_CONTRACT="$BIG_SWARM_CONTRACT"
+else
+    SWARM_CONTRACT="$SMALL_SWARM_CONTRACT"
+fi
 
-echo "Loading ..." > /root/logs/node_log.log
+PARAM_B=7
+# while true; do
+#     echo -en $GREEN_TEXT
+#     read -p ">> How many parameters (in billions)? [0.5, 1.5, 7, 32, 72] " pc
+#     echo -en $RESET_TEXT
+#     pc=${pc:-0.5}  # Default to "0.5" if the user presses Enter
+#     case $pc in
+#         0.5 | 1.5 | 7 | 32 | 72) PARAM_B=$pc && break ;;
+#         *)  echo ">>> Please answer in [0.5, 1.5, 7, 32, 72]." ;;
+#     esac
+# done
 
-if [ "$CONNECT_TO_TESTNET" = "True" ]; then
+if [ "$CONNECT_TO_TESTNET" = true ]; then
     # Run modal_login server.
     echo "Please login to create an Ethereum Server Wallet"
     cd modal-login
     # Check if the yarn command exists; if not, install Yarn.
-    
-    if ! command -v yarn >/dev/null 2>&1; then
+    source ~/.bashrc
+
+    # Node.js + NVM setup
+    if ! command -v node > /dev/null 2>&1; then
+        echo "Node.js not found. Installing NVM and latest Node.js..."
+        export NVM_DIR="$HOME/.nvm"
+        if [ ! -d "$NVM_DIR" ]; then
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+        fi
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+        nvm install node
+    else
+        echo "Node.js is already installed: $(node -v)"
+    fi
+
+    if ! command -v yarn > /dev/null 2>&1; then
         # Detect Ubuntu (including WSL Ubuntu) and install Yarn accordingly
-        if grep -qi "ubuntu" /etc/os-release 2>/dev/null || uname -r | grep -qi "microsoft"; then
+        if grep -qi "ubuntu" /etc/os-release 2> /dev/null || uname -r | grep -qi "microsoft"; then
             echo "Detected Ubuntu or WSL Ubuntu. Installing Yarn via apt..."
             curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
             echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
@@ -158,14 +203,10 @@ if [ "$CONNECT_TO_TESTNET" = "True" ]; then
         fi
     fi
     yarn install
-#    yarn upgrade
-#    yarn add next@latest
-#    yarn add viem@latest
-#    yarn add encoding@latest
-    yarn dev > /dev/null 2>&1 & # Run in background and suppress output
+    yarn dev &
 
-    # install_cloudflared
-    # start_tunnel
+    install_cloudflared
+    start_tunnel
 
     if [ ! -f $IDENTITY_PATH ]; then
         SERVER_PID=$!  # Store the process ID
@@ -174,16 +215,27 @@ if [ "$CONNECT_TO_TESTNET" = "True" ]; then
         # open http://localhost:3000
         cd ..
 
-        curl -s "http://localhost:3000" > /dev/null
-        
+    SERVER_PID=$!  # Store the process ID
+    echo "Started server process: $SERVER_PID"
+    sleep 5
+
+    curl -s "http://localhost:3000" > /dev/null
+
+    # # Try to open the URL in the default browser
+    # if open http://localhost:3000 2> /dev/null; then
+    #     echo_green ">> Successfully opened http://localhost:3000 in your default browser."
+    # else
+    #     echo ">> Failed to open http://localhost:3000. Please open it manually."
+    # fi
+
+    cd ..
+
+    if [ ! -f "${IDENTITY_PATH}"]; then
         echo_green ">> Waiting for modal userData.json to be created..."
         while [ ! -f "modal-login/temp-data/userData.json" ]; do
             sleep 5  # Wait for 5 seconds before checking again
         done
         echo "Found userData.json. Proceeding..."
-
-        ORG_ID=$(awk 'BEGIN { FS = "\"" } !/^[ \t]*[{}]/ { print $(NF - 1); exit }' modal-login/temp-data/userData.json)
-        echo "Your ORG_ID is set to: $ORG_ID"
 
         # Wait until the API key is activated by the client
         echo "Waiting for API key to become activated..."
@@ -200,36 +252,46 @@ if [ "$CONNECT_TO_TESTNET" = "True" ]; then
         done
     fi
 
-    # # Function to clean up the server process
-    # cleanup() {
-    #     echo_green ">> Shutting down server..."
-    #     kill $SERVER_PID
-    #     rm -r modal-login/temp-data/*.json
-    #     exit 0
-    # }
-
-    # # Set up trap to catch Ctrl+C and call cleanup
-    # trap cleanup INT
+    ENV_FILE="$ROOT"/modal-login/.env
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS version
+        sed -i '' "3s/.*/SMART_CONTRACT_ADDRESS=$SWARM_CONTRACT/" "$ENV_FILE"
+    else
+        # Linux version
+        sed -i "3s/.*/SMART_CONTRACT_ADDRESS=$SWARM_CONTRACT/" "$ENV_FILE"
+    fi
 fi
 
+echo_green ">> Getting requirements..."
 pip_install() {
-    pip3 install --disable-pip-version-check -q -r "$1"
+    pip3 install --break-system-packages --disable-pip-version-check -q -r "$1"
 }
 
-echo_green ">> Getting requirements..."
-pip_install "$ROOT"/requirements-hivemind.txt
-pip_install "$ROOT"/requirements.txt
+# echo_green ">> Getting requirements..."
+# pip_install "$ROOT"/requirements-hivemind.txt
+# pip_install "$ROOT"/requirements.txt
 
-if ! command -v nvidia-smi &> /dev/null; then
-    # You don't have a NVIDIA GPU
-    CONFIG_PATH="$ROOT/hivemind_exp/configs/mac/grpo-qwen-2.5-0.5b-deepseek-r1.yaml"
-elif [ -n "$CPU_ONLY" ]; then
-    # ... or we don't want to use it
-    CONFIG_PATH="$ROOT/hivemind_exp/configs/mac/grpo-qwen-2.5-0.5b-deepseek-r1.yaml"
+# pip install --upgrade pip
+if [ -n "$CPU_ONLY" ] || ! command -v nvidia-smi &> /dev/null; then
+    # CPU-only mode or no NVIDIA GPU found
+    pip install -r "$ROOT"/requirements-cpu.txt
+    CONFIG_PATH="$ROOT/hivemind_exp/configs/mac/grpo-qwen-2.5-0.5b-deepseek-r1.yaml" # TODO: Fix naming.
+    GAME="gsm8k"
 else
     # NVIDIA GPU found
-    pip_install "$ROOT"/requirements_gpu.txt
-    CONFIG_PATH="$ROOT/hivemind_exp/configs/gpu/grpo-qwen-2.5-0.5b-deepseek-r1.yaml"
+    pip install -r "$ROOT"/requirements-gpu.txt
+    pip install flash-attn --no-build-isolation
+
+    case "$PARAM_B" in
+        32 | 72) CONFIG_PATH="$ROOT/hivemind_exp/configs/gpu/grpo-qwen-2.5-${PARAM_B}b-bnb-4bit-deepseek-r1.yaml" && break ;;
+        0.5 | 1.5 | 7) CONFIG_PATH="$ROOT/hivemind_exp/configs/gpu/grpo-qwen-2.5-${PARAM_B}b-deepseek-r1.yaml" && break ;;
+        *)  echo ">>> Please answer in [0.5, 1.5, 7, 32, 72]." ;;
+    esac
+    if [ "$USE_BIG_SWARM" = true ]; then
+        GAME="dapo"
+    else
+        GAME="gsm8k"
+    fi
 fi
 
 echo_green ">> Done!"
@@ -254,7 +316,6 @@ echo_green ">> Good luck in the swarm!"
 echo_blue ">> Post about rl-swarm on X/twitter! --> https://tinyurl.com/swarmtweet"
 echo_blue ">> And remember to star the repo on GitHub! --> https://github.com/gensyn-ai/rl-swarm"
 
-cd ~/rl-swarm
 ORG_ID=$(awk 'BEGIN { FS = "\"" } !/^[ \t]*[{}]/ { print $(NF - 1); exit }' modal-login/temp-data/userData.json)
 echo "Your ORG_ID is set to: $ORG_ID"
 
@@ -269,13 +330,14 @@ get_last_log &
 trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
 
 sed -i -E 's/(startup_timeout: *float *= *)[0-9.]+/\1120/' $(python -c "import hivemind.p2p.p2p_daemon as m; print(m.__file__)")
-# sed -i -E 's/\(await_ready=await_ready\)/\(await_ready=await_ready,timeout=600\)/' /usr/local/lib/python3.11/dist-packages/hivemind/dht/dht.py
 if [ -n "$ORG_ID" ]; then
     python -m hivemind_exp.gsm8k.train_single_gpu \
         --hf_token "$HUGGINGFACE_ACCESS_TOKEN" \
         --identity_path "$IDENTITY_PATH" \
         --modal_org_id "$ORG_ID" \
-        --config "$CONFIG_PATH" 2>&1 | tee /root/logs/node_log.log
+        --contract_address "$SWARM_CONTRACT" \
+        --config "$CONFIG_PATH" \
+        --game "$GAME"
 else
     python -m hivemind_exp.gsm8k.train_single_gpu \
         --hf_token "$HUGGINGFACE_ACCESS_TOKEN" \
@@ -283,7 +345,8 @@ else
         --public_maddr "$PUB_MULTI_ADDRS" \
         --initial_peers "$PEER_MULTI_ADDRS" \
         --host_maddr "$HOST_MULTI_ADDRS" \
-        --config "$CONFIG_PATH" 2>&1 | tee /root/logs/node_log.log
+        --config "$CONFIG_PATH" \
+        --game "$GAME"
 fi
 
 wait  # Keep script running until Ctrl+C
