@@ -186,7 +186,7 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
     echo "Please login to create an Ethereum Server Wallet"
     cd modal-login
     # Check if the yarn command exists; if not, install Yarn.
-    source ~/.bashrc
+    # source ~/.bashrc
 
     # Node.js + NVM setup
     if ! command -v node > /dev/null 2>&1; then
