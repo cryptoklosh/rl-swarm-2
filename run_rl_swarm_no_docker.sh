@@ -223,13 +223,6 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
     run_tunnel & 
     trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
 
-    if [ ! -f $IDENTITY_PATH ]; then
-        SERVER_PID=$!  # Store the process ID
-        echo "Started server process: $SERVER_PID"
-        sleep 5
-        # open http://localhost:3000
-        cd ..
-
     SERVER_PID=$!  # Store the process ID
     echo "Started server process: $SERVER_PID"
     sleep 5
