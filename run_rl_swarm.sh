@@ -252,7 +252,7 @@ if [ -n "$CPU_ONLY" ] || ! command -v nvidia-smi &> /dev/null; then
     GAME="gsm8k"
 else
     # NVIDIA GPU found
-    # pip install -r "$ROOT"/requirements-gpu.txt
+    pip install -r "$ROOT"/requirements-gpu.txt
     pip install flash-attn --no-build-isolation
 
     case "$PARAM_B" in
