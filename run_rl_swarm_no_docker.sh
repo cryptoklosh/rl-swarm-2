@@ -98,13 +98,15 @@ start_tunnel() {
 }
 
 run_tunnel() {
-    PID=$(start_tunnel)
+    start_tunnel
+    PID=$?
     while true; do
         sleep 2h
         if curl -f $(cat ~/cloudflared/url.txt) > /dev/null 2>&1; then
             echo "Cloudflared tunnel is expired. Renewing..."
             kill $PID 2>/dev/null || true
-            PID=$(start_tunnel)
+            start_tunnel
+            PID=$?
         else
             echo "Cloudflared tunnel is still active. No need to renew."
         fi
