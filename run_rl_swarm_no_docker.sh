@@ -203,7 +203,7 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
         fi
     fi
     yarn install
-    yarn dev &
+    yarn dev > /dev/null 2>&1 &
 
     install_cloudflared
     start_tunnel
