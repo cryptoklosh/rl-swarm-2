@@ -88,13 +88,27 @@ start_tunnel() {
         if [ -n "$FORWARDING_URL" ]; then
             echo -e "Cloudflared tunnel started successfully."
             echo "${FORWARDING_URL}" > ~/cloudflared/url.txt
-            return
+            return $TUNNEL_PID
         fi
         counter=$((counter + 1))
     done
     echo -e "Timeout waiting for cloudflared URL."
     kill $TUNNEL_PID 2>/dev/null || true
     exit 1
+}
+
+run_tunnel() {
+    PID=$(start_tunnel)
+    while true; do
+        sleep 2h
+        if curl -f $(cat ~/cloudflared/url.txt) > /dev/null 2>&1; then
+            echo "Cloudflared tunnel is expired. Renewing..."
+            kill $PID 2>/dev/null || true
+            PID=$(start_tunnel)
+        else
+            echo "Cloudflared tunnel is still active. No need to renew."
+        fi
+    done
 }
 
 # Function to clean up the server process upon exit
@@ -206,7 +220,8 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
     yarn dev > /dev/null 2>&1 &
 
     install_cloudflared
-    start_tunnel
+    run_tunnel & 
+    trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
 
     if [ ! -f $IDENTITY_PATH ]; then
         SERVER_PID=$!  # Store the process ID
