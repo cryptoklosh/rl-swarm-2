@@ -220,7 +220,7 @@ curl -s "http://localhost:3000" > /dev/null
 
 cd ..
 
-if [ ! -f "${IDENTITY_PATH}"]; then
+if [ ! -f "${IDENTITY_PATH}" ]; then
     echo_green ">> Waiting for modal userData.json to be created..."
     while [ ! -f "modal-login/temp-data/userData.json" ]; do
         sleep 5  # Wait for 5 seconds before checking again
