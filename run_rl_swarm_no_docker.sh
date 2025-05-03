@@ -155,7 +155,7 @@ else
     SWARM_CONTRACT="$SMALL_SWARM_CONTRACT"
 fi
 
-PARAM_B=7
+PARAM_B=1.5
 # while true; do
 #     echo -en $GREEN_TEXT
 #     read -p ">> How many parameters (in billions)? [0.5, 1.5, 7, 32, 72] " pc
@@ -230,7 +230,7 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
 
     cd ..
 
-    if [ ! -f "${IDENTITY_PATH}"]; then
+    if [ ! -f "${IDENTITY_PATH}" ]; then
         echo_green ">> Waiting for modal userData.json to be created..."
         while [ ! -f "modal-login/temp-data/userData.json" ]; do
             sleep 5  # Wait for 5 seconds before checking again
