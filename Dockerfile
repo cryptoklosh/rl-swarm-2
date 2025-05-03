@@ -25,8 +25,7 @@ RUN --mount=type=cache,mode=0777,target=$YARN_CACHE_FOLDER yarn install && \
 WORKDIR /root
 COPY requirements-$CPU_GPU.txt requirements-$CPU_GPU.txt
 
-RUN --mount=type=cache,target=/root/.cache/pip \
-    if [ $CPU_GPU == "cpu" ] ; then \
+RUN --mount=type=cache,target=/root/.cache/pip if [ "$CPU_GPU" == "cpu" ]; then \
         pip3 install -r requirements-$CPU_GPU.txt --break-system-packages; \
     fi
 
