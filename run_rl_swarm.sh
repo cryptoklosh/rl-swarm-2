@@ -294,16 +294,6 @@ cd ~
 ORG_ID=$(awk 'BEGIN { FS = "\"" } !/^[ \t]*[{}]/ { print $(NF - 1); exit }' modal-login/temp-data/userData.json)
 echo "Your ORG_ID is set to: $ORG_ID"
 
-function get_last_log {
-    while true; do
-        sleep 5m
-        cat /root/logs/node_log.log | tail -40 > /root/logs/last_40.log
-    done
-}
-
-get_last_log &
-trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
-
 sed -i -E 's/(startup_timeout: *float *= *)[0-9.]+/\1120/' $(python -c "import hivemind.p2p.p2p_daemon as m; print(m.__file__)")
 sed -i -E 's/\(await_ready=await_ready\)/\(await_ready=await_ready,timeout=600\)/' /usr/local/lib/python3.11/dist-packages/hivemind/dht/dht.py
 if [ -n "$ORG_ID" ]; then
