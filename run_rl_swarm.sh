@@ -314,7 +314,7 @@ if [ -n "$ORG_ID" ]; then
         --modal_org_id "$ORG_ID" \
         --contract_address "$SWARM_CONTRACT" \
         --config "$CONFIG_PATH" \
-        --game "$GAME" | tee /root/logs/node_log.log
+        --game "$GAME" | tee ./logs/node_log.log
 else
     python -u -m hivemind_exp.gsm8k.train_single_gpu \
         --hf_token "$HUGGINGFACE_ACCESS_TOKEN" \
@@ -323,7 +323,7 @@ else
         --initial_peers "$PEER_MULTI_ADDRS" \
         --host_maddr "$HOST_MULTI_ADDRS" \
         --config "$CONFIG_PATH" \
-        --game "$GAME" | tee /root/logs/node_log.log
+        --game "$GAME" | tee ./logs/node_log.log
 fi
 
 wait  # Keep script running until Ctrl+C
