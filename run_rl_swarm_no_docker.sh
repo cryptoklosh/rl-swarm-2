@@ -171,7 +171,7 @@ else
     SWARM_CONTRACT="$SMALL_SWARM_CONTRACT"
 fi
 
-PARAM_B=1.5
+PARAM_B=7
 # while true; do
 #     echo -en $GREEN_TEXT
 #     read -p ">> How many parameters (in billions)? [0.5, 1.5, 7, 32, 72] " pc
