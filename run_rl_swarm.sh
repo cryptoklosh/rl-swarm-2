@@ -227,6 +227,9 @@ if [ ! -f "${IDENTITY_PATH}" ]; then
     done
     echo "Found userData.json. Proceeding..."
 
+    ORG_ID=$(awk 'BEGIN { FS = "\"" } !/^[ \t]*[{}]/ { print $(NF - 1); exit }' modal-login/temp-data/userData.json)
+    echo "Your ORG_ID is set to: $ORG_ID"
+
     # Wait until the API key is activated by the client
     echo "Waiting for API key to become activated..."
     while true; do
