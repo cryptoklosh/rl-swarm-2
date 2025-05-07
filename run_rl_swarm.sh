@@ -14,54 +14,52 @@ IDENTITY_PATH=${IDENTITY_PATH:-$ROOT/identity/swarm.pem}
 CPU_ONLY=${CPU_ONLY:-}
 ORG_ID=${ORG_ID:-}
 
-# Colors
+# Simple colored echo
 GREEN="\033[32m"; RESET="\033[0m"
 echo_green(){ echo -e "${GREEN}$1${RESET}"; }
 
 # Banner
 echo_green "From Gensyn → Starting RL Swarm"
 
-# Upgrade setuptools & packaging toolchain
-echo_green "Upgrading setuptools & packaging..."
-pip3 install --no-cache-dir --upgrade setuptools>=67.6.0 packaging wheel
-
-# Install Python deps
-echo_green "Installing Python requirements..."
+# Helper: install via host’s setuptools (no isolated build)
 pip_install(){
-  pip3 install --disable-pip-version-check -q -r "$1"
+  pip3 install --disable-pip-version-check --no-build-isolation -q -r "$1"
 }
+
+echo_green "Installing Python requirements..."
 if [ -n "$CPU_ONLY" ] || ! command -v nvidia-smi &> /dev/null; then
   pip_install "$ROOT/requirements-cpu.txt"
 else
   pip_install "$ROOT/requirements-gpu.txt"
 fi
 
-# Start frontend for login
+# Start modal-login frontend
 echo_green "Starting modal-login server..."
 cd modal-login
 yarn dev > /dev/null 2>&1 &
 SERVER_PID=$!
 sleep 5
 
-echo_green "Waiting for login…"
+echo_green "Waiting for user login..."
 while [ ! -f temp-data/userData.json ]; do sleep 2; done
 ORG_ID=$(grep -oP '(?<="orgId": ")[^"]+' temp-data/userData.json)
 echo_green "Detected ORG_ID: $ORG_ID"
 cd "$ROOT"
 
-# Patch HIVEmind timeouts
+# Patch hivemind timeouts
 echo_green "Patching hivemind timeouts..."
 PYDAEMON=$(python3 -c "import hivemind.p2p.p2p_daemon as m; print(m.__file__)")
 sed -i -E 's/(startup_timeout: *float *= *)[0-9]+/\1120/' "$PYDAEMON"
 sed -i -E 's/\(await_ready=await_ready\)/\(await_ready=await_ready,timeout=600\)/' \
     /usr/local/lib/python3.11/dist-packages/hivemind/dht/dht.py
 
-# Launch the training
-echo_green "Launching training on $( [ -n "$CPU_ONLY" ] && echo CPU || echo GPU )"
+# Launch training
+echo_green "Launching training ($( [ -n "$CPU_ONLY" ] && echo CPU || echo GPU ))..."
 python3 -u -m hivemind_exp.gsm8k.train_single_gpu \
   --hf_token "$HF_HUB_DOWNLOAD_TIMEOUT" \
   --identity_path "$IDENTITY_PATH" \
   --modal_org_id "$ORG_ID" \
+  --contract_address "$SWARM_CONTRACT" \
   --config "$ROOT/hivemind_exp/configs/gpu/grpo-qwen-2.5-1.5b-deepseek-r1.yaml" \
   --game gsm8k
 

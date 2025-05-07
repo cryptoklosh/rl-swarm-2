@@ -1,16 +1,16 @@
 #!/bin/bash
 set -euo pipefail
 
-# Create self-signed cert for localhost
+# Create self-signed certificate for HTTPS (if needed)
 mkdir -p /root/ssl
 openssl req -x509 -newkey rsa:4096 \
   -keyout /root/ssl/key.pem -out /root/ssl/cert.pem \
   -sha256 -days 3650 -nodes \
   -subj "/C=XX/ST=NodesGarden/L=NodesGarden/O=NodesGarden/OU=NodesGarden/CN=localhost"
 
-# Upgrade pip so runtime installs parse platform tags correctly
-echo ">> Upgrading pip..."
-pip3 install --no-cache-dir --upgrade pip
+# Upgrade pip & setuptools at runtime so we reuse the host’s tooling
+echo ">> Upgrading pip & setuptools for runtime installs..."
+pip3 install --no-cache-dir --upgrade pip setuptools>=67.6.0 packaging
 
-# Then call the main runner
-./run_rl_swarm.sh
+# Delegate to the main runner
+exec ./run_rl_swarm.sh
