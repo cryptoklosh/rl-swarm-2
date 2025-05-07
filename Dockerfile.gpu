@@ -23,15 +23,15 @@ ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
 
 RUN nvcc --version
 
-RUN --mount=type=cache,target=/root/.cache/pip pip3 install --no-cache-dir \
-      torch torchvision torchaudio \
-      --extra-index-url https://download.pytorch.org/whl/cu122 
+# RUN --mount=type=cache,target=/root/.cache/pip pip3 install --no-cache-dir \
+#       torch torchvision torchaudio \
+#       --extra-index-url https://download.pytorch.org/whl/cu122 
 
-RUN --mount=type=cache,target=/root/.cache/pip pip3 install --no-cache-dir \
-      packaging setuptools wheel \
-      cython numpy 
+# RUN --mount=type=cache,target=/root/.cache/pip pip3 install --no-cache-dir \
+#       packaging setuptools wheel \
+#       cython numpy 
 
-RUN --mount=type=cache,target=/root/.cache/pip pip3 install --no-cache-dir flash-attn --no-build-isolation 
+# RUN --mount=type=cache,target=/root/.cache/pip pip3 install --no-cache-dir flash-attn --no-build-isolation 
 
 
 ADD https://deb.nodesource.com/setup_23.x nodesource_setup.sh
