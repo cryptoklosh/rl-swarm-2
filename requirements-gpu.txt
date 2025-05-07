@@ -11,9 +11,9 @@ torch
 transformers==4.48.2
 trl
 # unsloth @ git+https://github.com/gensyn-ai/unsloth
-git+https://github.com/gensyn-ai/unsloth@unpin_proto#egg=unsloth
+unsloth @ git+https://github.com/gensyn-ai/unsloth@unpin_proto#egg=unsloth
 # unsloth_zoo @ git+https://github.com/gensyn-ai/unsloth-zoo
-git+https://github.com/gensyn-ai/unsloth-zoo@unpin_proto#egg=unsloth_zoo
+unsloth_zoo @ git+https://github.com/gensyn-ai/unsloth-zoo@unpin_proto#egg=unsloth_zoo
 vllm==0.7.3
 wandb
 web3
