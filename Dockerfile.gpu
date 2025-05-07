@@ -25,13 +25,13 @@ RUN nvcc --version
 
 RUN --mount=type=cache,target=/root/.cache/pip pip3 install --no-cache-dir \
       torch torchvision torchaudio \
-      --extra-index-url https://download.pytorch.org/whl/cu122 --break-system-packages
+      --extra-index-url https://download.pytorch.org/whl/cu122 
 
 RUN --mount=type=cache,target=/root/.cache/pip pip3 install --no-cache-dir \
       packaging setuptools wheel \
-      cython numpy --break-system-packages
+      cython numpy 
 
-RUN --mount=type=cache,target=/root/.cache/pip pip3 install --no-cache-dir flash-attn --no-build-isolation --break-system-packages
+RUN --mount=type=cache,target=/root/.cache/pip pip3 install --no-cache-dir flash-attn --no-build-isolation 
 
 
 ADD https://deb.nodesource.com/setup_23.x nodesource_setup.sh
