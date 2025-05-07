@@ -1,44 +1,34 @@
 #!/bin/bash
-
 set -euo pipefail
 
 # General arguments
 export ROOT=$PWD
-
-export PUB_MULTI_ADDRS
-export PEER_MULTI_ADDRS
-export HOST_MULTI_ADDRS
-export IDENTITY_PATH
-export CONNECT_TO_TESTNET
-export ORG_ID
+export PUB_MULTI_ADDRS PEER_MULTI_ADDRS HOST_MULTI_ADDRS IDENTITY_PATH CONNECT_TO_TESTNET ORG_ID
 export HF_HUB_DOWNLOAD_TIMEOUT=120  # 2 minutes
 
-# Check if public multi-address is given else set to default
+# Default multi-addresses
 DEFAULT_PUB_MULTI_ADDRS=""
 PUB_MULTI_ADDRS=${PUB_MULTI_ADDRS:-$DEFAULT_PUB_MULTI_ADDRS}
-
-# Check if peer multi-address is given else set to default
-DEFAULT_PEER_MULTI_ADDRS="/ip4/38.101.215.13/tcp/30002/p2p/QmQ2gEXoPJg6iMBSUFWGzAabS2VhnzuS782Y637hGjfsRJ" # gensyn coordinator node
+DEFAULT_PEER_MULTI_ADDRS="/ip4/38.101.215.13/tcp/30002/p2p/QmQ2gEXoPJg6iMBSUFWGzAabS2VhnzuS782Y637hGjfsRJ"
 PEER_MULTI_ADDRS=${PEER_MULTI_ADDRS:-$DEFAULT_PEER_MULTI_ADDRS}
-
-# Check if host multi-address is given else set to default
 DEFAULT_HOST_MULTI_ADDRS="/ip4/0.0.0.0/tcp/38331"
 HOST_MULTI_ADDRS=${HOST_MULTI_ADDRS:-$DEFAULT_HOST_MULTI_ADDRS}
 
-# Path to an RSA private key. If this path does not exist, a new key pair will be created.
-# Remove this file if you want a new PeerID.
-DEFAULT_IDENTITY_PATH="$ROOT"/identity/swarm.pem
+# Identity path
+DEFAULT_IDENTITY_PATH="$ROOT/identity/swarm.pem"
 IDENTITY_PATH=${IDENTITY_PATH:-$DEFAULT_IDENTITY_PATH}
 
+# Constants
 SMALL_SWARM_CONTRACT="0x69C6e1D608ec64885E7b185d39b04B491a71768C"
 BIG_SWARM_CONTRACT="0x6947c6E196a48B77eFa9331EC1E3e45f3Ee5Fd58"
 
-# Will ignore any visible GPUs if set.
+# CPU-only override
 CPU_ONLY=${CPU_ONLY:-""}
 
-# Set if successfully parsed from modal-login/temp-data/userData.json.
+# Organization ID
 ORG_ID=${ORG_ID:-""}
 
+# Color codes
 GREEN_TEXT="\033[32m"
 BLUE_TEXT="\033[34m"
 RED_TEXT="\033[31m"
@@ -121,6 +111,7 @@ errnotify() {
 trap cleanup EXIT
 trap errnotify ERR
 
+# Welcome banner
 echo -e "\033[38;5;224m"
 cat << "EOF"
     ██████  ██            ███████ ██     ██  █████  ██████  ███    ███
@@ -132,50 +123,18 @@ cat << "EOF"
     From Gensyn
 EOF
 
-CONNECT_TO_TESTNET=true
-# while true; do
-#     echo -en $GREEN_TEXT
-#     read -p ">> Would you like to connect to the Testnet? [Y/n] " yn
-#     echo -en $RESET_TEXT
-#     yn=${yn:-Y}  # Default to "Y" if the user presses Enter
-#     case $yn in
-#         [Yy]*)  CONNECT_TO_TESTNET=true && break ;;
-#         [Nn]*)  CONNECT_TO_TESTNET=false && break ;;
-#         *)  echo ">>> Please answer yes or no." ;;
-#     esac
-# done
-
-USE_BIG_SWARM=false
-# while true; do
-#     echo -en $GREEN_TEXT
-#     read -p ">> Which swarm would you like to join (Math (A) or Math Hard (B))? [A/b] " ab
-#     echo -en $RESET_TEXT
-#     ab=${ab:-A}  # Default to "A" if the user presses Enter
-#     case $ab in
-#         [Aa]*)  USE_BIG_SWARM=false && break ;;
-#         [Bb]*)  USE_BIG_SWARM=true && break ;;
-#         *)  echo ">>> Please answer A or B." ;;
-#     esac
-# done
+# Determine swarm contract
+USE_BIG_SWARM=${USE_BIG_SWARM:-false}
 if [ "$USE_BIG_SWARM" = true ]; then
     SWARM_CONTRACT="$BIG_SWARM_CONTRACT"
-    echo "Using the big swarm contract: $SWARM_CONTRACT"
+    echo_green ">> Using big swarm: $SWARM_CONTRACT"
 else
     SWARM_CONTRACT="$SMALL_SWARM_CONTRACT"
-    echo "Using the swarm contract: $SWARM_CONTRACT"
+    echo_green ">> Using small swarm: $SWARM_CONTRACT"
 fi
 
-PARAM_B=1.5
-# while true; do
-#     echo -en $GREEN_TEXT
-#     read -p ">> How many parameters (in billions)? [0.5, 1.5, 7, 32, 72] " pc
-#     echo -en $RESET_TEXT
-#     pc=${pc:-0.5}  # Default to "0.5" if the user presses Enter
-#     case $pc in
-#         0.5 | 1.5 | 7 | 32 | 72) PARAM_B=$pc && break ;;
-#         *)  echo ">>> Please answer in [0.5, 1.5, 7, 32, 72]." ;;
-#     esac
-# done
+# Model size parameter
+PARAM_B=${PARAM_B:-1.5}
 
 # Create logs directory if it doesn't exist
 mkdir -p "$ROOT/logs"
@@ -215,7 +174,21 @@ if [ "$CONNECT_TO_TESTNET" = true ]; then
     yarn build > "$ROOT/logs/yarn.log" 2>&1
     yarn start >> "$ROOT/logs/yarn.log" 2>&1 & # Run in background and log output
 
-# install_cloudflared
+# Wait for login data
+echo_green ">> Waiting for userData.json..."
+while [ ! -f "modal-login/temp-data/userData.json" ]; do
+    sleep 5
+done
+
+# Extract ORG_ID
+ORG_ID=$(awk 'BEGIN { FS = "\"" } !/^[ \t]*[{}]/ { print $(NF-1); exit }' modal-login/temp-data/userData.json)
+echo_green ">> ORG_ID: $ORG_ID"
+
+# Update .env with contract address
+ENV_FILE="modal-login/.env"
+sed -i "3s/.*/SMART_CONTRACT_ADDRESS=$SWARM_CONTRACT/" "$ENV_FILE"
+
+# Start cloudflared tunnel (optional)
 # start_tunnel
 
 SERVER_PID=$!  # Store the process ID
@@ -293,39 +266,23 @@ echo_blue ">> Post about rl-swarm on X/twitter! --> https://tinyurl.com/swarmtwe
 echo_blue ">> And remember to star the repo on GitHub! --> https://github.com/gensyn-ai/rl-swarm"
 
 cd ~
-ORG_ID=$(awk 'BEGIN { FS = "\"" } !/^[ \t]*[{}]/ { print $(NF - 1); exit }' modal-login/temp-data/userData.json)
-echo "Your ORG_ID is set to: $ORG_ID"
 
-function get_last_log {
-    while true; do
-        sleep 5m
-        cat /root/logs/node_log.log | tail -40 > /root/logs/last_40.log
-    done
-}
+# Patch timeouts in hivemind
+sed -i -E 's/(startup_timeout: *float *= *)[0-9.]+/\1120/' \
+    $(python -c "import hivemind.p2p.p2p_daemon as m; print(m.__file__)")
+sed -i -E 's/\(await_ready=await_ready\)/\(await_ready=await_ready,timeout=600\)/' \
+    /usr/local/lib/python3.11/dist-packages/hivemind/dht/dht.py
 
-mkdir -p /root/logs
-get_last_log &
-trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
-
-sed -i -E 's/(startup_timeout: *float *= *)[0-9.]+/\1120/' $(python -c "import hivemind.p2p.p2p_daemon as m; print(m.__file__)")
-sed -i -E 's/\(await_ready=await_ready\)/\(await_ready=await_ready,timeout=600\)/' /usr/local/lib/python3.11/dist-packages/hivemind/dht/dht.py
+# Execute training
 if [ -n "$ORG_ID" ]; then
-    python -u -m hivemind_exp.gsm8k.train_single_gpu \
-        --hf_token "$HUGGINGFACE_ACCESS_TOKEN" \
+    python3 -u -m hivemind_exp.gsm8k.train_single_gpu \
+        --hf_token "${HF_HUB_DOWNLOAD_TIMEOUT}" \
         --identity_path "$IDENTITY_PATH" \
         --modal_org_id "$ORG_ID" \
         --contract_address "$SWARM_CONTRACT" \
-        --config "$CONFIG_PATH" \
-        --game "$GAME" 2>&1 | tee /root/logs/node_log.log
+        --config "$ROOT/hivemind_exp/configs/gpu/grpo-qwen-2.5-${PARAM_B}b-deepseek-r1.yaml" \
+        --game gsm8k
 else
-    python -u -m hivemind_exp.gsm8k.train_single_gpu \
-        --hf_token "$HUGGINGFACE_ACCESS_TOKEN" \
-        --identity_path "$IDENTITY_PATH" \
-        --public_maddr "$PUB_MULTI_ADDRS" \
-        --initial_peers "$PEER_MULTI_ADDRS" \
-        --host_maddr "$HOST_MULTI_ADDRS" \
-        --config "$CONFIG_PATH" \
-        --game "$GAME" 2>&1 | tee /root/logs/node_log.log
+    echo_blue ">> No ORG_ID, exiting."
+    exit 1
 fi
-
-wait  # Keep script running until Ctrl+C
