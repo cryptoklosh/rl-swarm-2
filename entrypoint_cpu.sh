@@ -5,4 +5,4 @@ openssl req -x509 -newkey rsa:4096 -keyout /root/ssl/key.pem -out /root/ssl/cert
 
 # python3 -m venv .venv
 # source .venv/bin/activate
-./run_rl_swarm.sh
+./run_rl_swarm_cpu.sh

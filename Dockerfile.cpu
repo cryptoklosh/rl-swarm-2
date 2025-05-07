@@ -34,5 +34,5 @@ RUN chmod +x /usr/local/bin/cloudflared
 
 COPY . .
 
-RUN chmod +x ./entrypoint.sh
-ENTRYPOINT [ "/root/entrypoint.sh" ]
+RUN chmod +x ./entrypoint_cpu.sh
+ENTRYPOINT [ "/root/entrypoint_cpu.sh" ]
