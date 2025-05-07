@@ -31,22 +31,21 @@ RUN pip3 install --no-cache-dir \
       torch torchvision torchaudio \
       --extra-index-url https://download.pytorch.org/whl/cu122
 
-# 5. Ensure setuptools is new enough to accept string licenses, plus build prereqs
+# 5. Ensure setuptools is new enough to accept string licenses
 RUN pip3 install --no-cache-dir \
       "setuptools>=67.6.0" \
-      wheel \
-      packaging \
-      cython \
-      numpy
+      wheel packaging
 
-# 6. Build FlashAttention at image-build time
+# 6. Preinstall build prerequisites
+RUN pip3 install --no-cache-dir cython numpy
+
+# 7. Build FlashAttention
 RUN pip3 install --no-cache-dir flash-attn --no-build-isolation
 
-# 7. Node.js & Yarn setup
+# 8. Node.js & Yarn setup
 ADD https://deb.nodesource.com/setup_23.x nodesource_setup.sh
 RUN chmod +x nodesource_setup.sh && ./nodesource_setup.sh && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends nodejs && \
+    apt-get update && apt-get install -y --no-install-recommends nodejs && \
     npm install --global yarn && \
     rm -rf /var/lib/apt/lists/* nodesource_setup.sh
 
@@ -56,14 +55,13 @@ RUN yarn config set cache-folder $YARN_CACHE_FOLDER
 COPY modal-login/package.json modal-login/package-lock.json ./
 RUN --mount=type=cache,target=$YARN_CACHE_FOLDER yarn install
 
-# 8. Cloudflared for tunneling
+# 9. Cloudflared for tunneling
 ADD https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 \
     /usr/local/bin/cloudflared
 RUN chmod +x /usr/local/bin/cloudflared
 
-# 9. Copy application code & entrypoint
+# 10. Copy application code & entrypoint
 WORKDIR /root
 COPY . .
 RUN chmod +x ./entrypoint.sh
-
 ENTRYPOINT [ "/root/entrypoint.sh" ]
