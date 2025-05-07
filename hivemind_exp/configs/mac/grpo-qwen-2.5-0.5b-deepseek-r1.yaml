@@ -27,7 +27,7 @@ max_prompt_length: 64 # This might not get you rewards so you can try change it 
 max_completion_length: 256 # Same as above change it to 1024
 
 # CPU-specific optimizations
-num_workers: 8  # Adjust based on your total threads 
+num_workers: 20  # Adjust based on your total threads 
 ddp_enabled: true
 torch_distributed_backend: "gloo"  # CPU-friendly DDP backend
 torch_num_threads: 20  # Adjust based on your total threads
