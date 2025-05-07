@@ -1,48 +1,46 @@
 # syntax = docker/dockerfile:1.4
 FROM nvidia/cuda:12.2.0-devel-ubuntu20.04
 
-# 1. Prevent interactive prompts and allow pip to break system packages
+# 1. Prevent interactive prompts
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
 
 WORKDIR /root
 
-# 2. Install system & build dependencies
+# 2. Install system & build deps
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-      build-essential \
-      cmake \
-      ninja-build \
-      python3-dev \
-      wget curl git \
-      python3 python3-venv python3-pip \
+      build-essential cmake ninja-build python3-dev \
+      wget curl git python3 python3-venv python3-pip \
       nodejs && \
     rm -rf /var/lib/apt/lists/*
 
-# 3. Expose CUDA compiler
+# 3. Upgrade pip itself so it can parse local-version tags
+RUN pip3 install --no-cache-dir --upgrade pip
+
+# 4. Expose CUDA compiler
 ENV CUDA_HOME=/usr/local/cuda
 ENV PATH=${CUDA_HOME}/bin:${PATH}
 ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
 RUN nvcc --version
 
-# 4. Install GPU-enabled PyTorch (CUDA 12.2)
+# 5. Install GPU PyTorch
 RUN pip3 install --no-cache-dir \
       torch torchvision torchaudio \
       --extra-index-url https://download.pytorch.org/whl/cu122
 
-# 5. Ensure setuptools is new enough to accept string licenses
+# 6. Ensure setuptools is new enough for PEP-621
 RUN pip3 install --no-cache-dir \
-      "setuptools>=67.6.0" \
-      wheel packaging
+      "setuptools>=67.6.0" wheel packaging
 
-# 6. Preinstall build prerequisites
+# 7. Preinstall build prereqs
 RUN pip3 install --no-cache-dir cython numpy
 
-# 7. Build FlashAttention
+# 8. Build FlashAttention
 RUN pip3 install --no-cache-dir flash-attn --no-build-isolation
 
-# 8. Node.js & Yarn setup
+# 9. Node.js & Yarn setup
 ADD https://deb.nodesource.com/setup_23.x nodesource_setup.sh
 RUN chmod +x nodesource_setup.sh && ./nodesource_setup.sh && \
     apt-get update && apt-get install -y --no-install-recommends nodejs && \
@@ -55,14 +53,14 @@ RUN yarn config set cache-folder $YARN_CACHE_FOLDER
 COPY modal-login/package.json modal-login/package-lock.json ./
 RUN --mount=type=cache,target=$YARN_CACHE_FOLDER yarn install
 
-# 9. Cloudflared for tunneling
+# 10. Cloudflared for tunneling
 ADD https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 \
     /usr/local/bin/cloudflared
 RUN chmod +x /usr/local/bin/cloudflared
 
-# 10. Copy application code & entrypoint
+# 11. Copy application code + scripts
 WORKDIR /root
 COPY . .
-RUN chmod +x ./entrypoint.sh
-RUN chmod +x ./run_rl_swarm.sh
+RUN chmod +x ./entrypoint.sh ./run_rl_swarm.sh
+
 ENTRYPOINT [ "/root/entrypoint.sh" ]
