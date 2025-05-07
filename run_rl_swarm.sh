@@ -11,7 +11,6 @@ PUB_MULTI_ADDRS=${PUB_MULTI_ADDRS:-}
 PEER_MULTI_ADDRS=${PEER_MULTI_ADDRS:-/ip4/38.101.215.13/tcp/30002/p2p/QmQ2gEXoPJg6iMBSUFWGzAabS2VhnzuS782Y637hGjfsRJ}
 HOST_MULTI_ADDRS=${HOST_MULTI_ADDRS:-/ip4/0.0.0.0/tcp/38331}
 IDENTITY_PATH=${IDENTITY_PATH:-$ROOT/identity/swarm.pem}
-CPU_ONLY=${CPU_ONLY:-}
 ORG_ID=${ORG_ID:-}
 
 # Simple colored echo
@@ -274,7 +273,7 @@ sed -i -E 's/\(await_ready=await_ready\)/\(await_ready=await_ready,timeout=600\)
     /usr/local/lib/python3.11/dist-packages/hivemind/dht/dht.py
 
 # Launch training
-echo_green "Launching training ($( [ -n "$CPU_ONLY" ] && echo CPU || echo GPU ))..."
+echo_green "Launching training (GPU)..."
 python3 -u -m hivemind_exp.gsm8k.train_single_gpu \
   --hf_token "$HF_HUB_DOWNLOAD_TIMEOUT" \
   --identity_path "$IDENTITY_PATH" \
