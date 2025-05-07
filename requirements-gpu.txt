@@ -1,7 +1,8 @@
 bitsandbytes
 colorlog
 datasets
-hivemind @ git+https://github.com/learning-at-home/hivemind@1.11.11
+# hivemind @ git+https://github.com/learning-at-home/hivemind@1.11.11
+hivemind @ git+https://github.com/learning-at-home/hivemind@b3a8c3a
 hf-transfer
 peft
 pytest
