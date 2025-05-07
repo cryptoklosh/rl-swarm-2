@@ -31,14 +31,14 @@ RUN pip3 install --no-cache-dir \
       --extra-index-url https://download.pytorch.org/whl/cu122
 
 # 6. New setuptools for PEP 621
-RUN pip3 install --no-cache-dir \
-      "setuptools>=67.6.0" wheel packaging
+# RUN pip3 install --no-cache-dir \
+#       "setuptools>=67.6.0" wheel packaging
 
 # 7. Build prerequisites
-RUN pip3 install --no-cache-dir cython numpy
+# RUN pip3 install --no-cache-dir cython numpy
 
 # 8. Build FlashAttention
-RUN pip3 install --no-cache-dir flash-attn --no-build-isolation
+# RUN pip3 install --no-cache-dir flash-attn --no-build-isolation
 
 # 9. Node.js & Yarn
 ADD https://deb.nodesource.com/setup_23.x nodesource_setup.sh
