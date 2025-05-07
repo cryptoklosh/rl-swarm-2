@@ -23,16 +23,10 @@ ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
 
 RUN nvcc --version
 
-RUN pip3 install --no-cache-dir \
-      torch torchvision torchaudio \
-      --extra-index-url https://download.pytorch.org/whl/cu122 --break-system-packages
-
-RUN pip3 install --no-cache-dir \
-      packaging setuptools wheel \
-      cython numpy --break-system-packages
-
-RUN pip3 install --no-cache-dir flash-attn --no-build-isolation --break-system-packages
-
+# 3. Install GPU-enabled PyTorch (CUDA 12.2)
+RUN --mount=type=cache,target=/root/.cache/pip pip3 install \
+      torch torchvision torchaudio packaging setuptools wheel cython numpy flash-attn \
+      --extra-index-url https://download.pytorch.org/whl/cu122
 
 ADD https://deb.nodesource.com/setup_23.x nodesource_setup.sh
 RUN chmod +x nodesource_setup.sh && ./nodesource_setup.sh && \
