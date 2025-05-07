@@ -159,8 +159,10 @@ USE_BIG_SWARM=false
 # done
 if [ "$USE_BIG_SWARM" = true ]; then
     SWARM_CONTRACT="$BIG_SWARM_CONTRACT"
+    echo "Using the big swarm contract: $SWARM_CONTRACT"
 else
     SWARM_CONTRACT="$SMALL_SWARM_CONTRACT"
+    echo "Using the swarm contract: $SWARM_CONTRACT"
 fi
 
 PARAM_B=1.5
