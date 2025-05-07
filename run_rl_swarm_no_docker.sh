@@ -277,7 +277,7 @@ fi
 
 echo_green ">> Getting requirements..."
 pip_install() {
-    pip3 install --break-system-packages --disable-pip-version-check -q -r "$1"
+    pip3 install --disable-pip-version-check -q -r "$1"
 }
 
 # echo_green ">> Getting requirements..."
@@ -293,7 +293,7 @@ if [ -n "$CPU_ONLY" ] || ! command -v nvidia-smi &> /dev/null; then
 else
     # NVIDIA GPU found
     pip_install "$ROOT"/requirements-gpu.txt
-    pip install flash-attn --break-system-packages --no-build-isolation
+    pip install flash-attn --no-build-isolation
 
     case "$PARAM_B" in
         32 | 72) CONFIG_PATH="$ROOT/hivemind_exp/configs/gpu/grpo-qwen-2.5-${PARAM_B}b-bnb-4bit-deepseek-r1.yaml" && break ;;
