@@ -10,7 +10,7 @@ openssl req -x509 -newkey rsa:4096 \
 
 # Upgrade pip & setuptools at runtime so we reuse the host’s tooling
 echo ">> Upgrading pip & setuptools for runtime installs..."
-pip3 install --no-cache-dir --upgrade pip setuptools>=67.6.0 packaging
+pip3 install --no-cache-dir 'setuptools<67.6.0' wheel packaging
 
 # Delegate to the main runner
 exec ./run_rl_swarm.sh
