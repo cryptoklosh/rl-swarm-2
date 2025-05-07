@@ -64,4 +64,5 @@ RUN chmod +x /usr/local/bin/cloudflared
 WORKDIR /root
 COPY . .
 RUN chmod +x ./entrypoint.sh
+RUN chmod +x ./run_rl_swarm.sh
 ENTRYPOINT [ "/root/entrypoint.sh" ]
