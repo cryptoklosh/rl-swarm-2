@@ -22,7 +22,7 @@ echo_green "From Gensyn → Starting RL Swarm"
 
 # Helper: install via host’s setuptools (no isolated build)
 pip_install(){
-  pip3 install --disable-pip-version-check --no-build-isolation -q -r "$1"
+  pip3 install --disable-pip-version-check --no-build-isolation --no-use-pep517 -q -r "$1"
 }
 
 echo_green "Installing Python requirements..."
