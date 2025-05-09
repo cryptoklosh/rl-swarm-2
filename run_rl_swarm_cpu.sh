@@ -269,7 +269,11 @@ pip_install() {
 if [ -n "$CPU_ONLY" ] || ! command -v nvidia-smi &> /dev/null; then
     # CPU-only mode or no NVIDIA GPU found
     # pip install -r "$ROOT"/requirements-cpu.txt
-    CONFIG_PATH="$ROOT/hivemind_exp/configs/mac/grpo-qwen-2.5-0.5b-deepseek-r1.yaml" # TODO: Fix naming.
+    case "$CPU_NUMBER" in
+        8 ) CONFIG_PATH="$ROOT/hivemind_exp/configs/mac/grpo-qwen-2.5-0.5b-deepseek-r1-8cpu.yaml" && break ;;
+        14 ) CONFIG_PATH="$ROOT/hivemind_exp/configs/mac/grpo-qwen-2.5-0.5b-deepseek-r1-14cpu.yaml" && break ;;
+        * ) echo ">>> CPU_NUBMER is not correct" ;;
+    esac
     GAME="gsm8k"
 else
     # NVIDIA GPU found
