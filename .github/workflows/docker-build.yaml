@@ -53,6 +53,12 @@ jobs:
           registry: ${{ vars.DOCKER__REGISTRY }}
           username: ${{ secrets.DOCKER__USERNAME }}
           password: ${{ secrets.DOCKER__PASSWORD }}
+      - name: Login to GCP registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.GCP_ARTIFACT_REGISTRY_URL }}
+          username: _json_key_base64
+          password: ${{ secrets.GCP_ARTIFACT_REGISTRY_KEY }}
       - name: Build and Push
         uses: docker/build-push-action@v6
         with:
