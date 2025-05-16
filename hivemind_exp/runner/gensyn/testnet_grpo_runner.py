@@ -39,7 +39,7 @@ class TestnetGRPORunner(GRPORunner):
         logger.info(f"Bootnodes from chain: {peers}")
 
         # Filter out dead peers (optional)
-        alive_peers = [p for p in peers if not p.startswith('/ip4/38.101.215.14')]
+        alive_peers = [p for p in peers if not p.startswith('/ip4/38.101.215.15')]
         return alive_peers if alive_peers else []
 
     def register_peer(self, peer_id):
