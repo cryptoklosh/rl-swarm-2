@@ -82,19 +82,24 @@ export default function Home() {
 
   // Show alert if crypto.subtle isn't available.
   useEffect(() => {
-    if (typeof window === undefined) {
-      return;
-    }
+    if (typeof window === "undefined") return;
+
     try {
       if (typeof window.crypto.subtle !== "object") {
         throw new Error("window.crypto.subtle is not available");
       }
     } catch (err) {
       alert(
-        "Crypto api is not available in browser. Please be sure that the app is being accessed via localhost or a secure connection.",
+        "Crypto API is not available in this browser. Please use HTTPS or localhost."
       );
     }
   }, []);
+
+  useEffect(() => {
+    if (!user && !signerStatus.isInitializing) {
+      openAuthModal();
+    }
+  }, [user, signerStatus.isInitializing]);
 
   return (
     <main className="flex min-h-screen flex-col items-center gap-4 justify-center text-center">
