@@ -271,6 +271,8 @@ ORG_ID=$(awk 'BEGIN{FS="\""} !/^[ \t]*[{}]/{print $(NF-1); exit}' modal-login/te
 echo_green ">> ORG_ID: $ORG_ID"
 
 sed -i -E 's/(startup_timeout: *float *= *)[0-9.]+/\1120/' $(python -c "import hivemind.p2p.p2p_daemon as m; print(m.__file__)")
+rm -rf .venv/lib/python3.10/site-packages/trl/trainer/grpo_trainer.py
+cp fixes/grpo_trainer.py .venv/lib/python3.10/site-packages/trl/trainer/grpo_trainer.py
 if [ -n "$ORG_ID" ]; then
     python -m hivemind_exp.gsm8k.train_single_gpu \
         --hf_token "$HUGGINGFACE_ACCESS_TOKEN" \
