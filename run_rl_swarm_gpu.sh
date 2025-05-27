@@ -216,7 +216,7 @@ if [ -n "$CPU_ONLY" ] || ! command -v nvidia-smi &>/dev/null; then
     GAME="gsm8k"
 else
     pip install -r "$ROOT/requirements-gpu.txt"
-    pip install flash-attn --no-build-isolation
+    # pip install flash-attn --no-build-isolation
 
     if [[ "$PARAM_B" == "32" || "$PARAM_B" == "72" ]]; then
         CONFIG_PATH="$ROOT/hivemind_exp/configs/gpu/grpo-qwen-2.5-${PARAM_B}b-bnb-4bit-deepseek-r1.yaml"
