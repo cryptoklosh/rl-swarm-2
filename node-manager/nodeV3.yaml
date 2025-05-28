@@ -2,7 +2,7 @@ nodes:
 - id: ${env:NODE_ID}
   steps:
   - id: PUBLISH_NODE
-    host_ip: "${env:PUBLIC_IPADDR}:${env:VAST_TCP_PORT_22}"
+    host_ip: "${env:PUBLIC_IPADDR}:${env:CONTAINER_ID}"
     link: "${internal_data['cloudflare_url']}"
     state: deployment
     version: v0.4.2 (1.5b | math)
@@ -73,15 +73,15 @@ nodes:
 
 steps:
 - id: PUBLISH_HOST
-  name: "vastai-${env:PUBLIC_IPADDR}-${env:VAST_TCP_PORT_22}"
-  ip_address: "${env:PUBLIC_IPADDR}:${env:VAST_TCP_PORT_22}"
+  name: "vastai-CONTAINER_ID"
+  ip_address: "${env:PUBLIC_IPADDR}:${env:CONTAINER_ID}"
   state: online
   provider: vastai
   internal_data:
     ID: "${env:CONTAINER_ID}"
 - id: PUBLISH_SERVICE
   name: node
-  host_ip: ${env:PUBLIC_IPADDR}:${env:VAST_TCP_PORT_22}
+  host_ip: ${env:PUBLIC_IPADDR}:${env:CONTAINER_ID}
   node_id: ${env:NODE_ID}
   state: online
   internal_data:
