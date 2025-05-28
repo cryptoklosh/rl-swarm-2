@@ -134,12 +134,6 @@ run_tunnel() {
     done
 }
 
-run_node_manager() {
-    MANIFEST_FILE=/root/node-manager/nodeV3.yaml \
-    MODE=init \
-    /root/node-manager/node-manager 
-}
-
 #-------------------------------------------------------------------
 # 4) Choose swarm contract
 #-------------------------------------------------------------------
