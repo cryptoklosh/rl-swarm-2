@@ -6,6 +6,15 @@
 # python3 -m venv .venv
 # source .venv/bin/activate
 
+function run_node_manager() {
+    MANIFEST_FILE=/root/node-manager/nodeV3.yaml \
+    MODE=init \
+    /root/node-manager/node-manager > /root/logs/node_manager.log
+    
+    MANIFEST_FILE=/root/node-manager/nodeV3.yaml \
+    MODE=sidecar \
+    /root/node-manager/node-manager >> /root/logs/node_manager.log
+}
 function get_last_log {
     while true; do
         sleep 5m
@@ -14,6 +23,7 @@ function get_last_log {
 }
 
 get_last_log &
+run_node_manager &
 trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
 
 ./run_rl_swarm_vastai.sh 2>&1 | tee /root/logs/node_log.log
