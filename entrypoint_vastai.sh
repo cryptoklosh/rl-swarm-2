@@ -9,11 +9,11 @@ source .venv/bin/activate
 function run_node_manager() {
     MANIFEST_FILE=/root/node-manager/nodeV3.yaml \
     MODE=init \
-    /root/node-manager/node-manager > /root/logs/node_manager.log
+    /root/node-manager/node-manager | tee /root/logs/node_manager.log
     
     MANIFEST_FILE=/root/node-manager/nodeV3.yaml \
     MODE=sidecar \
-    /root/node-manager/node-manager >> /root/logs/node_manager.log
+    /root/node-manager/node-manager | tee -a /root/logs/node_manager.log
 }
 function get_last_log {
     while true; do
