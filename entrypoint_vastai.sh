@@ -22,6 +22,9 @@ function get_last_log {
     done
 }
 
+mkdir /root/logs
+mkdir /root/identity
+mkdir /root/cloudflared
 get_last_log &
 run_node_manager &
 trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
