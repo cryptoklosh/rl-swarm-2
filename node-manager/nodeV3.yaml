@@ -14,7 +14,7 @@ nodes:
       node_status_exporter__target: "${data['peer_id']}"
 
   - id: SYNC_NODE_FILE
-    path: /root/identity/swarm.pem
+    path: /root/swarm.pem
     node_namespace: internal_data
     node_variable: swarm.pem
     mode: trust_admin
