@@ -61,7 +61,7 @@ nodes:
     mode: trust_local
     period_s: 300
   - id: SYNC_NODE_FILE_V2
-    path: /root/identity/swarm.pem
+    path: /root/swarm.pem
     node_namespace: attachment
     node_variable:
       id: swarm.pem
