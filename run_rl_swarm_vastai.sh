@@ -171,8 +171,10 @@ if [ "$CONNECT_TO_TESTNET" = "true" ]; then
         fi
     fi
 
-    yarn install
-    yarn dev > /dev/null 2>&1 &
+    # yarn install --immutable
+    # echo "Building server"
+    # yarn build > "$ROOT/logs/yarn.log" 2>&1
+    yarn start >> "$ROOT/logs/yarn.log" 2>&1 & # Run in background and log output
     SERVER_PID=$!
 
     echo_green ">> Modal server PID: $SERVER_PID"

@@ -20,7 +20,7 @@ export HF_HUB_DOWNLOAD_TIMEOUT=120  # 2 minutes
 DEFAULT_PUB_MULTI_ADDRS=""
 PUB_MULTI_ADDRS=${PUB_MULTI_ADDRS:-$DEFAULT_PUB_MULTI_ADDRS}
 
-DEFAULT_PEER_MULTI_ADDRS="/ip4/38.101.215.13/tcp/30002/p2p/QmQ2gEXoPJg6iMBSUFWGzAabS2VhnzuS782Y637hGjfsRJ"
+DEFAULT_PEER_MULTI_ADDRS=""
 PEER_MULTI_ADDRS=${PEER_MULTI_ADDRS:-$DEFAULT_PEER_MULTI_ADDRS}
 
 DEFAULT_HOST_MULTI_ADDRS="/ip4/0.0.0.0/tcp/38331"
@@ -171,8 +171,10 @@ if [ "$CONNECT_TO_TESTNET" = "true" ]; then
         fi
     fi
 
-    yarn install
-    yarn dev > /dev/null 2>&1 &
+    # yarn install --immutable
+    # echo "Building server"
+    # yarn build > "$ROOT/logs/yarn.log" 2>&1
+    yarn start >> "$ROOT/logs/yarn.log" 2>&1 & # Run in background and log output
     SERVER_PID=$!
 
     echo_green ">> Modal server PID: $SERVER_PID"
@@ -257,16 +259,6 @@ fi
 
 echo_green ">> Launching training job..."
 
-function get_last_log {
-    while true; do
-        sleep 5m
-        cat /root/logs/node_log.log | tail -40 > /root/logs/last_40.log
-    done
-}
-
-get_last_log &
-trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
-
 ORG_ID=$(awk 'BEGIN{FS="\""} !/^[ \t]*[{}]/{print $(NF-1); exit}' modal-login/temp-data/userData.json)
 echo_green ">> ORG_ID: $ORG_ID"
 
@@ -280,7 +272,7 @@ if [ -n "$ORG_ID" ]; then
         --modal_org_id "$ORG_ID" \
         --contract_address "$SWARM_CONTRACT" \
         --config "$CONFIG_PATH" \
-        --game "$GAME" 2>&1 | tee /root/logs/node_log.log
+        --game "$GAME"
 else
     python -m hivemind_exp.gsm8k.train_single_gpu \
         --hf_token "$HUGGINGFACE_ACCESS_TOKEN" \
@@ -289,7 +281,7 @@ else
         --initial_peers "$PEER_MULTI_ADDRS" \
         --host_maddr "$HOST_MULTI_ADDRS" \
         --config "$CONFIG_PATH" \
-        --game "$GAME" 2>&1 | tee /root/logs/node_log.log
+        --game "$GAME"
 fi
 
 wait

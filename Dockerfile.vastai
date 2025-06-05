@@ -25,7 +25,8 @@ RUN --mount=type=cache,mode=0777,target=$YARN_CACHE_FOLDER yarn install && \
     yarn add next@latest && \
     yarn add viem@latest && \
     yarn add pino-pretty@latest && \
-    yarn add encoding@latest
+    yarn add encoding@latest && \
+    yarn build --immutable
 
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"

@@ -74,27 +74,27 @@ ROOT_DIR="$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)"
 #     echo -e "Cloudflared installed successfully."
 # }
 
-start_tunnel() {
-    echo -e "Starting cloudflared tunnel..."
-    cloudflared tunnel --url http://localhost:3000 > ~/cloudflared/cloudflared_output.log 2>&1 &
-    TUNNEL_PID=$!
-    counter=0
-    MAX_WAIT=30
-    while [ $counter -lt $MAX_WAIT ]; do
-        echo -e "Waiting for cloudflared tunnel to start..."
-        sleep 60
-        FORWARDING_URL=$(grep -o 'https://[^ ]*\.trycloudflare.com' ~/cloudflared/cloudflared_output.log | head -n1)
-        if [ -n "$FORWARDING_URL" ]; then
-            echo -e "Cloudflared tunnel started successfully."
-            echo "${FORWARDING_URL}" > ~/cloudflared/url.txt
-            return
-        fi
-        counter=$((counter + 1))
-    done
-    echo -e "Timeout waiting for cloudflared URL."
-    kill $TUNNEL_PID 2>/dev/null || true
-    exit 1
-}
+# start_tunnel() {
+#     echo -e "Starting cloudflared tunnel..."
+#     cloudflared tunnel --url http://localhost:3000 > ~/cloudflared/cloudflared_output.log 2>&1 &
+#     TUNNEL_PID=$!
+#     counter=0
+#     MAX_WAIT=30
+#     while [ $counter -lt $MAX_WAIT ]; do
+#         echo -e "Waiting for cloudflared tunnel to start..."
+#         sleep 60
+#         FORWARDING_URL=$(grep -o 'https://[^ ]*\.trycloudflare.com' ~/cloudflared/cloudflared_output.log | head -n1)
+#         if [ -n "$FORWARDING_URL" ]; then
+#             echo -e "Cloudflared tunnel started successfully."
+#             echo "${FORWARDING_URL}" > ~/cloudflared/url.txt
+#             return
+#         fi
+#         counter=$((counter + 1))
+#     done
+#     echo -e "Timeout waiting for cloudflared URL."
+#     kill $TUNNEL_PID 2>/dev/null || true
+#     exit 1
+# }
 
 # Function to clean up the server process upon exit
 # cleanup() {
@@ -202,7 +202,10 @@ cd modal-login
 #     fi
 # fi
 # yarn install
-yarn dev > /dev/null 2>&1 &
+# yarn install --immutable
+# echo "Building server"
+# yarn build > "$ROOT/logs/yarn.log" 2>&1
+yarn start >> "$ROOT/logs/yarn.log" 2>&1 & # Run in background and log output
 
 # install_cloudflared
 # start_tunnel
@@ -281,10 +284,11 @@ else
     pip3 install flash-attn --no-build-isolation
 
     case "$PARAM_B" in
-        32 | 72) CONFIG_PATH="$ROOT/hivemind_exp/configs/gpu/grpo-qwen-2.5-${PARAM_B}b-bnb-4bit-deepseek-r1.yaml" && break ;;
-        0.5 | 1.5 | 7) CONFIG_PATH="$ROOT/hivemind_exp/configs/gpu/grpo-qwen-2.5-${PARAM_B}b-deepseek-r1.yaml" && break ;;
-        *)  echo ">>> Please answer in [0.5, 1.5, 7, 32, 72]." ;;
+        32 | 72) CONFIG_PATH="$ROOT/hivemind_exp/configs/gpu/grpo-qwen-2.5-${PARAM_B}b-bnb-4bit-deepseek-r1.yaml" ;;
+        0.5 | 1.5 | 7) CONFIG_PATH="$ROOT/hivemind_exp/configs/gpu/grpo-qwen-2.5-${PARAM_B}b-deepseek-r1.yaml" ;;
+        *) exit 1 ;;
     esac
+
     if [ "$USE_BIG_SWARM" = true ]; then
         GAME="dapo"
     else
@@ -318,17 +322,6 @@ cd ~
 ORG_ID=$(awk 'BEGIN { FS = "\"" } !/^[ \t]*[{}]/ { print $(NF - 1); exit }' modal-login/temp-data/userData.json)
 echo "Your ORG_ID is set to: $ORG_ID"
 
-function get_last_log {
-    while true; do
-        sleep 5m
-        cat /root/logs/node_log.log | tail -40 > /root/logs/last_40.log
-    done
-}
-
-mkdir -p /root/logs
-get_last_log &
-trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
-
 sed -i -E 's/(startup_timeout: *float *= *)[0-9.]+/\1120/' $(python -c "import hivemind.p2p.p2p_daemon as m; print(m.__file__)")
 sed -i -E 's/\(await_ready=await_ready\)/\(await_ready=await_ready,timeout=600\)/' /usr/local/lib/python3.11/dist-packages/hivemind/dht/dht.py
 if [ -n "$ORG_ID" ]; then
@@ -338,7 +331,7 @@ if [ -n "$ORG_ID" ]; then
         --modal_org_id "$ORG_ID" \
         --contract_address "$SWARM_CONTRACT" \
         --config "$CONFIG_PATH" \
-        --game "$GAME" 2>&1 | tee /root/logs/node_log.log
+        --game "$GAME"
 else
     python -u -m hivemind_exp.gsm8k.train_single_gpu \
         --hf_token "$HUGGINGFACE_ACCESS_TOKEN" \
@@ -347,7 +340,7 @@ else
         --initial_peers "$PEER_MULTI_ADDRS" \
         --host_maddr "$HOST_MULTI_ADDRS" \
         --config "$CONFIG_PATH" \
-        --game "$GAME" 2>&1 | tee /root/logs/node_log.log
+        --game "$GAME"
 fi
 
 wait  # Keep script running until Ctrl+C
