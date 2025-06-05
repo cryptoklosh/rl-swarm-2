@@ -19,7 +19,7 @@ WORKDIR /root/modal-login
 ENV YARN_CACHE_FOLDER=/root/.yarn
 RUN yarn config set cache-folder $YARN_CACHE_FOLDER
 COPY modal-login/package.json ./package.json
-COPY modal-login/package-lock.json ./package-lock.json
+COPY modal-login/yarn.lock ./yarn.lock
 RUN --mount=type=cache,mode=0777,target=$YARN_CACHE_FOLDER yarn install && \
     yarn upgrade && \
     yarn add next@latest && \
