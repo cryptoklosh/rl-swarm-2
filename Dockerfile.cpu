@@ -14,13 +14,13 @@ ENV YARN_CACHE_FOLDER=/root/.yarn
 RUN yarn config set cache-folder $YARN_CACHE_FOLDER
 COPY modal-login/package.json ./package.json
 COPY modal-login/yarn.lock ./yarn.lock
-RUN --mount=type=cache,mode=0777,target=$YARN_CACHE_FOLDER yarn install && \
+RUN --mount=type=cache,mode=0777,target=$YARN_CACHE_FOLDER yarn install --immutable && \
     yarn upgrade && \
     yarn add next@latest && \
     yarn add viem@latest && \
     yarn add pino-pretty@latest && \
     yarn add encoding@latest && \
-    yarn build --immutable
+    yarn build
 
 WORKDIR /root
 COPY requirements-cpu.txt requirements-cpu.txt
