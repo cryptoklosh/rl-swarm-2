@@ -5,7 +5,7 @@ nodes:
     host_ip: "${env:PUBLIC_IPADDR}:${env:CONTAINER_ID}"
     link: "${internal_data['cloudflare_url']}"
     state: deployment
-    version: v0.4.2 (1.5b | math)
+    version: v0.4.3 (0.5b | math)
     internal_data:
       node__id: ${env:NODE_ID}
       node_status_exporter__ver: "v2"
